@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import { Configuration, OpenAIApi } from 'openai';
+// import { Configuration, OpenAIApi } from 'openai';
 import { createStandaloneToast } from '@chakra-ui/toast';
 import {
   Popover,
@@ -18,15 +18,15 @@ import {
 } from '@chakra-ui/react';
 import { stringify } from 'querystring';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
-import { BiliBiliDanmu, MuaConfig } from 'renderer/@types/catcat';
-import BackgroundWave from 'renderer/components/BackgroundWave';
-import Titlebar from 'renderer/components/Titlebar';
+import { BiliBiliDanmu, MuaConfig } from '../@types/catcat';
+import BackgroundWave from '../components/BackgroundWave';
+import Titlebar from '../components/Titlebar';
 import dayjs from 'dayjs';
 import React from 'react';
-import CatLog from 'renderer/utils/CatLog';
-import SuperChatBar from 'renderer/components/SuperChatBar';
-import BackgroundMiku from 'renderer/components/BackgroundMiku';
-import * as CONSTANT from 'renderer/@types/catcat/constan';
+import CatLog from '../utils/CatLog';
+import SuperChatBar from '../components/SuperChatBar';
+import BackgroundMiku from '../components/BackgroundMiku';
+import * as CONSTANT from '../@types/catcat/constan';
 import { MdCheckCircle, MdBlock, MdCopyAll, MdOpenInBrowser, MdLiveTv } from 'react-icons/md';
 import axios from 'axios';
 import {
@@ -62,11 +62,11 @@ interface DanmuWindow {
 }
 const { toast } = createStandaloneToast();
 
-const configuration = new Configuration({
-  apiKey: 'sk-',
-});
+// const configuration = new Configuration({
+//   apiKey: 'sk-',
+// });
 
-const openai = new OpenAIApi(configuration);
+// const openai = new OpenAIApi(configuration);
 
 class DanmuWindow extends React.Component {
   listHeightRef: any = '';
@@ -133,7 +133,8 @@ class DanmuWindow extends React.Component {
     };
     super(props);
     const arr = catConfigItem.map((item) =>
-      window.electron.store.get(item.name)
+      // TODO get config from store
+      // window.electron.store.get(item.name)
     );
     arr.map((item: any, index: number) => {
       CatLog.console(item);
@@ -841,52 +842,52 @@ class DanmuWindow extends React.Component {
 }
 
 export default DanmuWindow;
-async function chatgpt(
-  req: { body: { messages: any } },
-  res: any,
-  muaConfig: MuaConfig
-) {
-  if (!configuration.apiKey) {
-    res.status = 500;
-    res.json = {
-      error: {
-        message:
-          'OpenAI API key not configured, please follow instructions in README.md',
-      },
-    };
-    return;
-  }
-  try {
-    const completion = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
-      messages: req.body.messages,
-    });
-    res.status = 200;
-    res.json = { result: completion.data.choices[0].message?.content };
-    send({
-      value: `${`[${completion.data.choices[0].message?.content}` as string}]`,
-      roomid: muaConfig.roomid,
-      SESSDATA: muaConfig.SESSDATA,
-      csrf: muaConfig.csrf,
-      muaConfig,
-    });
-  } catch (error: any) {
-    // Consider adjusting the error handling logic for your use case
-    if (error.response) {
-      console.error(error.response.status, error.response.data);
-      res.status = error.response.status;
-      res.json = error.response.data;
-    } else {
-      console.error(`Error with OpenAI API request: ${error.message}`);
-      res.status = 500;
-      res.json = {
-        error: {
-          message: 'An error occurred during your request.',
-        },
-      };
-    }
-  }
-}
+// async function chatgpt(
+//   req: { body: { messages: any } },
+//   res: any,
+//   muaConfig: MuaConfig
+// ) {
+//   if (!configuration.apiKey) {
+//     res.status = 500;
+//     res.json = {
+//       error: {
+//         message:
+//           'OpenAI API key not configured, please follow instructions in README.md',
+//       },
+//     };
+//     return;
+//   }
+//   try {
+//     const completion = await openai.createChatCompletion({
+//       model: 'gpt-3.5-turbo',
+//       messages: req.body.messages,
+//     });
+//     res.status = 200;
+//     res.json = { result: completion.data.choices[0].message?.content };
+//     send({
+//       value: `${`[${completion.data.choices[0].message?.content}` as string}]`,
+//       roomid: muaConfig.roomid,
+//       SESSDATA: muaConfig.SESSDATA,
+//       csrf: muaConfig.csrf,
+//       muaConfig,
+//     });
+//   } catch (error: any) {
+//     // Consider adjusting the error handling logic for your use case
+//     if (error.response) {
+//       console.error(error.response.status, error.response.data);
+//       res.status = error.response.status;
+//       res.json = error.response.data;
+//     } else {
+//       console.error(`Error with OpenAI API request: ${error.message}`);
+//       res.status = 500;
+//       res.json = {
+//         error: {
+//           message: 'An error occurred during your request.',
+//         },
+//       };
+//     }
+//   }
+// }
 
 async function send(arg0: {
   value: string;

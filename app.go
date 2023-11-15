@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+
+	"github.com/tucnak/store"
 )
 
 // App struct
@@ -19,6 +21,13 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	loadConfig()
+}
+
+func loadConfig() {
+	// load config
+	store.Init("CatCat")
+	var config Config
 }
 
 // Greet returns a greeting for the given name

@@ -1,6 +1,6 @@
 import { Link } from '@chakra-ui/react';
 import styles from '../styles/about.module.scss';
-import pack from '../../../package.json';
+import pack from '../../package.json';
 import * as CONSTANT from '../@types/catcat/constan';
 
 const About = () => {

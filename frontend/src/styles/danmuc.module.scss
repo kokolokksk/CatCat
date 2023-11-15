@@ -1,0 +1,212 @@
+.danmuContainer {
+    background-color: moccasin;
+    align-items: center;
+    font-family: 'Consolas','zxfyyt','YouYuan';
+    font-weight: bolder;
+
+    height: 8vh;
+    display: flex;
+    margin-left: 5vw;
+    margin-top: 0.8vh;
+    margin-right: 5vw;
+    margin-bottom: 0.8vh;
+    padding-right: 5px;
+}
+.danmuContainerDark {
+  background-color: rgb(207, 159, 159);
+  align-items: center;
+  font-family: 'Consolas','zxfyyt','YouYuan';
+  font-weight: bolder;
+  padding-right: 5px;
+  height: 8vh;
+  display: flex;
+  margin-left: 5vw;
+  margin-top: 0.8vh;
+  margin-right: 5vw;
+  margin-bottom: 0.8vh;
+}
+.giftContainer {
+  border: solid 1px teal;
+  text-shadow: 0 0 #489b6d;
+  align-items: center;
+  font-family: 'Consolas','zxfyyt','YouYuan';
+  padding-right: 5vw;
+  height: 8vh;
+  display: flex;
+  margin-left: 5vw;
+  margin-top: 0.8vh;
+  margin-right: 5vw;
+  margin-bottom: 0.8vh;
+}
+.danmuContainerMiku {
+  border: solid 1px teal;
+  text-shadow: 0 0 #489b6d;
+  align-items: center;
+  font-family: 'Consolas','zxfyyt','YouYuan';
+  padding-right: 5px;
+  height: 8vh;
+  display: flex;
+  background-color: white;
+  margin-left: 5vw;
+  margin-top: 0.8vh;
+  margin-right: 5vw;
+  margin-bottom: 0.8vh;
+}
+.hoverClassMiku:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(57 197 187 / var(--tw-bg-opacity));
+}
+.gbContainerMiku {
+  border: solid 1px teal;
+  text-shadow: 0 0 #489b6d;
+  align-items: center;
+  font-family: 'Consolas','zxfyyt','YouYuan';
+  padding-right: 5vw;
+  height: 8vh;
+  display: flex;
+  margin-left: 5vw;
+  margin-top: 0.8vh;
+  margin-right: 5vw;
+  margin-bottom: 0.8vh;
+}
+.gbContainer {
+  border: solid 1px teal;
+  text-shadow: 0 0 #489b6d;
+  align-items: center;
+  font-family: 'Consolas','zxfyyt','YouYuan';
+  padding-right: 5vw;
+  height: 8vh;
+  display: flex;
+  margin-left: 5vw;
+  margin-top: 0.8vh;
+  margin-right: 5vw;
+  margin-bottom: 0.8vh;
+}
+.comeinContainer{
+  position: absolute;
+  bottom: 10vh;
+    margin-left: 5vw;
+    z-index: 2;
+    }
+.superChatContainer {
+  text-shadow: 0 0 #489b6d;
+  align-items: center;
+  font-family: 'Consolas','zxfyyt','YouYuan';
+  padding-right: 5vw;
+  height: 8vh;
+  display: flex;
+  margin-left: 5vw;
+  margin-top: 0.8vh;
+  margin-right: 5vw;
+  margin-bottom: 0.8vh;
+}
+.superChatContainerDark {
+  background-color: rgb(207, 159, 159);
+  text-shadow: 0 0 #489b6d;
+  align-items: center;
+  font-family: 'Consolas','zxfyyt','YouYuan';
+  padding-right: 5vw;
+  height: 8vh;
+  display: flex;
+  margin-left: 5vw;
+  margin-top: 0.8vh;
+  margin-right: 5vw;
+  margin-bottom: 0.8vh;
+}
+.superChatContainerLight {
+  background-color: moccasin;
+  text-shadow: 0 0 #489b6d;
+  align-items: center;
+  font-family: 'Consolas','zxfyyt','YouYuan';
+  padding-right: 5vw;
+  height: 8vh;
+  display: flex;
+  margin-left: 5vw;
+  margin-top: 0.8vh;
+  margin-right: 5vw;
+  margin-bottom: 0.8vh;
+}
+.superChatContainerWave {
+  background-color: moccasin;
+  text-shadow: 0 0 #489b6d;
+  align-items: center;
+  font-family: 'Consolas','zxfyyt','YouYuan';
+  padding-right: 5vw;
+  height: 8vh;
+  display: flex;
+  margin-left: 5vw;
+  margin-top: 0.8vh;
+  margin-right: 5vw;
+  margin-bottom: 0.8vh;
+}
+.superChatContainerMiku {
+  background-color: white;
+  text-shadow: 0 0 #489b6d;
+  align-items: center;
+  font-family: 'Consolas','zxfyyt','YouYuan';
+  padding-right: 5vw;
+  height: 8vh;
+  display: flex;
+  margin-left: 5vw;
+  margin-top: 0.8vh;
+  margin-right: 5vw;
+  margin-bottom: 0.8vh;
+}
+.superChatContent {
+  margin-left: 2vw;
+  align-self: center;
+
+}
+.avatar {
+    margin-left: 2vw;
+    height: 5vh;
+    width: 5vh;
+    border-radius: 50%;
+}
+.chatImage {
+  margin-left: 2vw;
+  height: 5vh;
+}
+.avatarContainer {
+  display: contents;
+  position: relative;
+
+}
+.divider {
+  margin-left: 1vw !important;
+  margin-right: 1vw !important;
+  border-color: rgb(255, 100, 38) !important;
+  border-left-width: 1px !important;
+  border-style: dashed !important;
+}
+
+.dividerDark {
+  margin-left: 1vw !important;
+  margin-right: 1vw !important;
+  border-color: rgb(150, 50, 11) !important;
+  border-left-width: 1px !important;
+  border-style: dashed !important;
+}
+
+.fansAndNickname {
+    align-self: center;
+    font-size:smaller;
+    display: flex-root;
+}
+.danmuContent {
+    margin-left: 0vw;
+    align-self: center;
+}
+.dmName{
+    font-family: "YouYuan";
+    font-size: 10pt;
+    z-index: 3;
+    transition: all 1s ease-in 0;
+    transform: translateY(2vh);
+      }
+.noDrag {
+  -webkit-app-region: no-drag;
+}
+.drag {
+  -webkit-app-region: drag;
+}

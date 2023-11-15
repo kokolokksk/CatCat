@@ -1,0 +1,225 @@
+.titlebarLight{
+  background-color: #ffffff;
+  height: 4vh;
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+  display: inline-flex;
+  z-index: 1;
+  align-items: center;
+}
+.titlebarCloseLight {
+  position: fixed;
+  display: flex;
+  right: 0;
+  padding: 5px;
+  margin-right: 0px;
+  width:24px;
+  height: 4vh;
+  color: rgb(0, 0, 0) !important;
+}
+.titlebarCloseLight:hover {
+  position: fixed;
+  display: flex;
+  right: 0;
+  padding: 5px;
+  margin-right: 0px;
+  color: rgb(5, 5, 5) !important;
+  width:24px;
+  height: 4vh;
+  background-color: red;
+}
+
+.titlebarDark{
+  background-color: #1a202c;
+  height: 4vh;
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+  display: inline-flex;
+  z-index: 1;
+  align-items: center;
+}
+.titlebarCloseDark {
+  position: fixed;
+  display: flex;
+  right: 0;
+  padding: 5px;
+  margin-right: 0px;
+  width:24px;
+  height: 4vh;
+  color: rgb(255, 255, 255) !important;
+}
+.titlebarCloseDark:hover {
+  position: fixed;
+  display: flex;
+  right: 0;
+  padding: 5px;
+  margin-right: 0px;
+  width:24px;
+  height: 4vh;
+  color: #1a202c !important;
+  background-color: rgb(255, 71, 71);
+}
+
+.titlebarWave{
+  background-image: linear-gradient(to top, #27273c 20%, #27273c 80%);
+  height: 4vh;
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+  display: inline-flex;
+  z-index: 1;
+  align-items: center;
+}
+.titlebarCloseWave {
+  position: fixed;
+  display: flex;
+  right: 0;
+  padding: 5px;
+  margin-right: 0px;
+  width:24px;
+  height:24px;
+  color: rgb(255, 255, 255) !important;
+
+}
+.titlebarCloseWave:hover {
+  position: fixed;
+  display: flex;
+  right: 0;
+  padding: 5px;
+  width:24px;
+  height: 4vh;
+  margin-right: 0px;
+  color: rgb(255, 255, 255) !important;
+  background-color:  red;
+}
+
+.dragArea {
+  -webkit-app-region: drag;
+  height: 4vh;
+  width:  calc(100% - 1rem - 48px);
+}
+
+.titlebarMinusLight {
+  position: fixed;
+  right: 35px;
+  margin-right: -10px;
+  width:24px;
+  height: 4vh;
+  padding: 5px;
+  display:flex;
+  color: rgb(0, 0, 0) !important;
+}
+.titlebarMinusLight:hover {
+  position: fixed;
+  right: 35px;
+  margin-right: -10px;
+  width:24px;
+  height: 4vh;
+  padding: 5px;
+  display:flex;
+  color: rgb(5, 5, 5) !important;
+  background-color: red;
+}
+.titlebarMinusDark {
+  position: fixed;
+  right: 35px;
+  margin-right: -10px;
+  width:24px;
+  height: 4vh;
+  padding: 5px;
+  display:flex;
+  color: rgb(255, 255, 255) !important;
+}
+.titlebarMinusDark:hover {
+  position: fixed;
+  right: 35px;
+  width:24px;
+  height:24px;
+  padding: 5px;
+  display:flex;
+  margin-right: -10px;
+  color: #1a202c !important;
+  background-color: rgb(255, 71, 71);
+}
+.titlebarMinusWave {
+  position: fixed;
+  right: 35px;
+  width:24px;
+  padding: 5px;
+  height: 4vh;
+  display:flex;
+  margin-right: -10px;
+  color: rgb(255, 255, 255) !important;
+
+}
+.titlebarMinusWave:hover {
+  position: fixed;
+  right: 35px;
+  padding: 5px;
+  width:24px;
+  height: 4vh;
+  display:flex;
+  margin-right: -10px;
+  color: rgb(255, 255, 255) !important;
+  background-color: rgb(180, 180, 180);
+}
+
+// miku theme
+.titlebarMiku {
+  background-color: #39C5BB;
+  height: 4vh;
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+  display: inline-flex;
+  z-index: 1;
+  align-items: center;
+}
+
+.titlebarMinusMiku {
+  position: fixed;
+  right: 35px;
+  width:24px;
+  padding: 5px;
+  height: 4vh;
+  display:flex;
+  margin-right: -10px;
+  color: rgb(255, 255, 255) !important;
+
+}
+.titlebarMinusMiku:hover {
+  position: fixed;
+  right: 35px;
+  padding: 5px;
+  width:24px;
+  height: 4vh;
+  display:flex;
+  margin-right: -10px;
+  color: rgb(255, 255, 255) !important;
+  background-color: rgb(180, 200, 150);
+}
+
+.titlebarCloseMiku {
+  position: fixed;
+  display: flex;
+  right: 0;
+  padding: 5px;
+  margin-right: 0px;
+  width:24px;
+  height: 4vh;
+  color: rgb(255, 255, 255) !important;
+
+}
+.titlebarCloseMiku:hover {
+  position: fixed;
+  display: flex;
+  right: 0;
+  padding: 5px;
+  width:24px;
+  height: 4vh;
+  margin-right: 0px;
+  color: rgb(255, 255, 255) !important;
+  background-color:  red;
+}

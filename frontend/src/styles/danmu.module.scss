@@ -1,0 +1,159 @@
+.m_bg_top {
+
+}
+
+.root {
+
+  -moz-box-shadow: 8px 8px 8px gray;
+		-webkit-box-shadow: 8px 8px 8px gray;
+		box-shadow: 1px 1px 0px gray;
+    -webkit-background-size: 50px 50px;
+		-moz-background-size: 50px 50px;
+		background-size: 50px 50px;
+    display: flex;
+    position: relative;
+    top: 4vh;
+    height:96vh;
+    width: 100vw;
+    flex-flow: wrap;
+    justify-content: center;
+}
+.rootWave {
+
+  -moz-box-shadow: 8px 8px 8px gray;
+		-webkit-box-shadow: 8px 8px 8px gray;
+		box-shadow: 1px 1px 0px gray;
+    -webkit-background-size: 50px 50px;
+		-moz-background-size: 50px 50px;
+		background-size: 50px 50px;
+    display: flex;
+    position: relative;
+    top: 4vh;
+    height:96vh;
+    width: 100vw;
+    flex-flow: wrap;
+    justify-content: center;
+
+}
+.rootLight {
+
+  -moz-box-shadow: 8px 8px 8px gray;
+		-webkit-box-shadow: 8px 8px 8px gray;
+		box-shadow: 1px 1px 0px gray;
+    -webkit-background-size: 50px 50px;
+		-moz-background-size: 50px 50px;
+		background-size: 50px 50px;
+    display: flex;
+    position: relative;
+    top: 4vh;
+    height:96vh;
+    width: 100vw;
+    flex-flow: wrap;
+    background-color: #ffffff;
+    justify-content: center;
+}
+.rootDark {
+  background-color: #1a202c;
+  -moz-box-shadow: 8px 8px 8px gray;
+		-webkit-box-shadow: 8px 8px 8px gray;
+		box-shadow: 1px 1px 0px gray;
+    -webkit-background-size: 50px 50px;
+		-moz-background-size: 50px 50px;
+		background-size: 50px 50px;
+    display: flex;
+    position: relative;
+    top: 4vh;
+    height:96vh;
+    width: 100vw;
+    flex-flow: wrap;
+    justify-content: center;
+}
+.rootMiku {
+  background-color: #39C5BB;
+  -moz-box-shadow: 8px 8px 8px gray;
+		-webkit-box-shadow: 8px 8px 8px gray;
+		box-shadow: 1px 1px 0px gray;
+    -webkit-background-size: 50px 50px;
+		-moz-background-size: 50px 50px;
+		background-size: 50px 50px;
+    display: flex;
+    position: relative;
+    top: 4vh;
+    height:96vh;
+    width: 100vw;
+    flex-flow: wrap;
+    justify-content: center;
+}
+.online {
+  height: 5vh;
+    background-color: transparent;
+    color: #ff7113;
+    font-family:  'Consolas','zxfyyt','YouYuan';
+    z-index: 5;
+    margin-left: 5vw;
+  }
+
+  .comeinLastMinute {
+    right: 1%;
+    margin-right: 5vw;
+    position: fixed;
+    background-color: transparent;
+    font-family:  'Consolas','zxfyyt','YouYuan';
+    color: #ff7113;
+    z-index: 5;
+  }
+
+  .c_bg{
+    position: relative;
+    overflow: overlay;
+    /* padding-top: 20vh; */
+    overflow: hidden;
+    height: 72vh;
+    z-index: 1;
+    width: 100%;
+    flex-wrap: wrap;
+    /* background-image: repeating-radial-gradient(circle at 50% 50%,#e98892 20px, #e98892 20px, #e98892 40px, #e98892 40px, #e98892 60px, #e98892 60px, #e98892 80px, #e98892 80px, #e98892 100px); */
+    background: transparent;
+    }
+    .drag {
+      -webkit-app-region: drag;
+    }
+    ::-webkit-scrollbar{
+      display: none;
+    }
+
+
+
+
+
+
+
+      .dmName{
+        font-family: "YouYuan";
+        font-size: 10pt;
+        color: rgb(32, 32, 32);
+        /* display: flex; */
+        /* margin-bottom: 5px; */
+        /* align-items: center; */
+        /* display: inline-block; */
+        align-content: center;
+        /* background-color: teal; */
+        height: 15%;
+        width: 100%;
+        z-index: 3;
+        transition: all 1s ease-in 0;
+        transform: translateY(2vh);
+      }
+
+      .chatContainer {
+       display: flex;
+       flex-direction: column-reverse;
+        -webkit-app-region: no-drag;
+        background-color: transparent;
+        align-content: center;
+        position: absolute;
+        bottom: 0.4vh;
+        width: 99%;
+        height: 8vh;
+        z-index: 2;
+      }
