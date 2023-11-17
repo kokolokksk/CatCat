@@ -11,6 +11,8 @@ const BILIBILI_API_GET_DANMU_INFO = "https://api.live.bilibili.com/xlive/web-roo
 const BILIBILI_API_GET_ROOM_INFO = "http://api.live.bilibili.com/room/v1/Room/get_info?room_id=%d"
 const BILIBILI_API_GET_ROOM_INIT = "https://api.live.bilibili.com/room/v1/Room/room_init?id=%d"
 const BILIBILI_API_LIVE_USER_INFO = "https://api.live.bilibili.com/live_user/v1/Master/info?uid=%d"
+const BILIBILI_API_QR_LOGIN_INFO = "https://passport.bilibili.com/qrcode/getLoginInfo?oauthKey=%d"
+const BILIBILI_API_QR_LOGIN_URL = "https://passport.bilibili.com/qrcode/getLoginUrl"
 
 type ResultDanmuInfo struct {
 	Code    int
@@ -216,6 +218,53 @@ func GetLiveUserInfo(uid int) ResultLiveUserInfo {
 	defer resp.Body.Close()
 	body, _ := io.ReadAll(resp.Body)
 	var result ResultLiveUserInfo
+	json.Unmarshal(body, &result)
+	return result
+}
+
+type ResultQRLoginInfo struct {
+	Code   int
+	Status bool
+	Ts     int
+	Data   struct {
+		Url      string
+		OauthKey string
+	}
+}
+
+func GetQRLoginInfo() ResultQRLoginInfo {
+	resp, err := http.Get(BILIBILI_API_QR_LOGIN_URL)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+	var result ResultQRLoginInfo
+	json.Unmarshal(body, &result)
+	return result
+}
+
+type ResultQRLoginStatus struct {
+	Status  bool        `json:"status"`
+	Data    interface{} `json:"data"`
+	Message string      `json:"message"`
+	Code    int         `json:"code"`
+	Ts      int64       `json:"ts"`
+}
+
+type Data struct {
+	Url string `json:"url"`
+}
+
+func GetQRLoginStatus(oauthKey int) ResultQRLoginStatus {
+	url := fmt.Sprintf(BILIBILI_API_QR_LOGIN_INFO, oauthKey)
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+	var result ResultQRLoginStatus
 	json.Unmarshal(body, &result)
 	return result
 }
