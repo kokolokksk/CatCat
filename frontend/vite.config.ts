@@ -12,8 +12,7 @@ export default defineConfig({
     host: '0.0.0.0',
     proxy: {
       '/client': 'https://api.ririra.com',
-      '/repos':"https://api.github.com",
-      "/qrcode":"https://passport.bilibili.com"
+      '/repos':"https://api.github.com"
     }
   }
 
