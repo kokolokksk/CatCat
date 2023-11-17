@@ -17,17 +17,20 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { QRCodeSVG } from 'qrcode.react';
-import SettingSelectItem from 'renderer/components/SettingSelectItem';
+import SettingSelectItem from '../components/SettingSelectItem';
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import CatLog from 'renderer/utils/CatLog';
+import CatLog from '../utils/CatLog';
 import SliderMenu from '../components/SliderMenu';
 import styles from '../styles/setting.module.scss';
 import SettingInputItem from '../components/SettingInputItem';
 import { catConfigItem } from '../components/CatCat';
-import pack from '../../../package.json';
+import pack from '../../package.json';
 // import '../samples/electron-store'
 import SettingSwitchItem from '../components/SettingSwitchItem';
+import { GetConfig,API_GetDanmuInfo, API_GetRoomInfo, API_GetRoomInit, API_GetLiveUserInfo, SavePic } from '../../wailsjs/go/main/App';
+import { BrowserOpenURL, WindowSetSize } from '../../wailsjs/runtime';
+import { useNavigate } from 'react-router-dom';
 // const catConfig = window.catConfig
 // catConfig.setDataPath('F://catConfig.json')
 
@@ -57,80 +60,53 @@ const Setting = () => {
     if (!num) {
       return;
     }
-    axios
-      .get(
-        `https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id=${num}`
-      )
-      // eslint-disable-next-line func-names
-      // eslint-disable-next-line promise/always-return
-      .then((res) => {
-        console.log(res);
-        window.electron.store.set('key', res.data.data.token);
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
+    const di = API_GetDanmuInfo(num);
+    di.then((res) => {
+      console.log("API_GetDanmuInfo",res);
+      GetConfig().then((config: any) => {
+        if (config) {
+          config.key = res.Data.Token;
+        }
       });
-    axios
-      .get(`https://api.live.bilibili.com/room/v1/Room/room_init?id=${num}`)
-      // eslint-disable-next-line func-names
-      // eslint-disable-next-line promise/always-return
-      .then(function (response) {
-        // handle success
-        console.log(response);
-        const { uid } = response.data.data;
-        // eslint-disable-next-line promise/always-return
-        if (uid) {
-          axios.defaults.withCredentials = true;
-          // eslint-disable-next-line promise/no-nesting
-          axios({
-            url: `https://api.live.bilibili.com/live_user/v1/Master/info?uid=${uid}`,
-          })
-            // eslint-disable-next-line func-names
-            // eslint-disable-next-line promise/always-return
-            // eslint-disable-next-line @typescript-eslint/no-shadow
-            // eslint-disable-next-line func-names
-            // eslint-disable-next-line promise/always-return
-            .then(function (response1) {
-              console.log(response1);
+    });
+
+    API_GetRoomInit(num).then((res) => {
+      console.log("API_GetRoomInit",res);
+      const  uid   = res.Data.Uid;
+      if (uid) {
+        API_GetLiveUserInfo(uid).then((resultLiveUserInfo) => {
+          console.log(resultLiveUserInfo);
+            const loaclPicUrl = SavePic(resultLiveUserInfo.Data.Info.Face);
+            console.log("loaclPicUrl",loaclPicUrl);
+            loaclPicUrl.then((res) => {
               setCatConfigData({
                 ...catConfigData,
-                faceImg: response1.data.data.info.face,
-                nickname: response1.data.data.info.uname,
-                live_status: response.data.data.live_status,
+                faceImg: res,
+                nickname: resultLiveUserInfo.Data.Info.Uname,
+                live_status: resultLiveUserInfo.Data.Live_status,
               });
-              catConfigData.live_status = response.data.data.live_status;
-            })
-            // eslint-disable-next-line func-names
-            .catch(function (error) {
-              console.log(error);
             });
-        }
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
-      });
-    axios
-      .get(`http://api.live.bilibili.com/room/v1/Room/get_info?room_id=${num}`)
-      .then((response2) => {
-        console.log(response2);
+            
+            catConfigData.live_status = resultLiveUserInfo.Data.Live_status;
+          });
+        } 
+    });
+    API_GetRoomInfo(num).then((res) => {
+        console.log("API_GetRoomInfo",res);
         setCatConfigData({
           ...catConfigData,
-          real_roomid: response2.data.data.room_id,
-          area_id: response2.data.data.area_id,
-          parent_area_id: response2.data.data.parent_area_id,
+          real_roomid: res.Data.room_id,
+          area_id: res.Data.Area_id,
+          parent_area_id: res.Data.Parent_area_id,
         });
-        window.electron.store.set('real_roomid', response2.data.data.room_id);
-        window.electron.store.set('area_id', response2.data.data.area_id);
-        window.electron.store.set(
-          'parent_area_id',
-          response2.data.data.parent_area_id
-        );
-        return response2;
-      })
-      .catch((error) => {
-        console.log(error);
+        GetConfig().then((config: any) => {
+          if (config) {
+            config.real_roomid = res.Data.Room_id;
+            config.area_id = res.Data.Area_id;
+            config.parent_area_id = res.Data.Parent_area_id;
+            //config.save();
+          }
+        });
       });
   };
 
@@ -145,12 +121,20 @@ const Setting = () => {
           ? `${catConfigData.recentroomid},${Number(t)}`
           : `${Number(t)}`,
       });
-      window.electron.store.set(
-        'recentroomid',
-        catConfigData.recentroomid
-          ? `${catConfigData.recentroomid},${Number(t)}`
-          : `${Number(t)}`
-      );
+      // window.electron.store.set(
+      //   'recentroomid',
+      //   catConfigData.recentroomid
+      //     ? `${catConfigData.recentroomid},${Number(t)}`
+      //     : `${Number(t)}`
+      // );
+      GetConfig().then((config: any) => {
+        if (config) {
+          config.recentroomid = catConfigData.recentroomid
+            ? `${catConfigData.recentroomid},${Number(t)}`
+            : `${Number(t)}`;
+          //config.save();
+        }
+      })
       load(Number(t));
       catConfigData.roomid = Number(t);
       catConfigData.recentroomid = catConfigData.recentroomid
@@ -164,9 +148,15 @@ const Setting = () => {
         SESSDATA: catConfigData.SESSDATA,
         csrf: catConfigData.csrf,
       };
-      window.electron.ipcRenderer.updateRoomTitle('updateRoomTitle', [arg]);
+      //window.electron.ipcRenderer.updateRoomTitle('updateRoomTitle', [arg]);
     }
-    window.electron.store.set(skey, t);
+    //window.electron.store.set(skey, t);
+    GetConfig().then((config: any) => {
+      if (config) {
+        config[skey] = t;
+       // config.save();
+      }
+    })
   };
   const { colorMode, toggleColorMode } = useColorMode();
   CatLog.console(colorMode);
@@ -231,33 +221,45 @@ const Setting = () => {
   // }, [catConfigData.roomid]);
   const commonSwitchItemSave = async (skey: any, value: any) => {
     CatLog.console(value.target.checked);
-    window.electron.store.set(skey, value.target.checked);
+    //window.electron.store.set(skey, value.target.checked);
+    GetConfig().then((config: any) => {
+      if (config) {
+        config[skey] = value.target.checked;
+        //config.save();
+      }
+    })
     if (skey === 'darkMode') {
       toggleColorMode();
       // const isDarkMode = window.darkMode.toggle(value.target.checked);
-      window.electron.ipcRenderer.sendMessage(
-        'dark-mode:toggle',
-        value.target.checked
-      );
+      // window.electron.ipcRenderer.sendMessage(
+      //   'dark-mode:toggle',
+      //   value.target.checked
+      // );
     }
     if (skey === 'alwaysOnTop') {
       // set is on top
-      window.electron.ipcRenderer.sendMessage('setOnTop:setting', [
-        value.target.checked,
-      ]);
+      // window.electron.ipcRenderer.sendMessage('setOnTop:setting', [
+      //   value.target.checked,
+      // ]);
     }
   };
   const commonSelectItemSave = async (skey: any, value: any) => {
-    window.electron.store.set(skey, value.target.value);
+   // window.electron.store.set(skey, value.target.value);
+    GetConfig().then((config: any) => {
+      if (config) {
+        config[skey] = value.target.value;
+        //config.save();
+      }
+    })
     if (skey === 'theme') {
       setCatConfigData({
         ...catConfigData,
         theme: value.target.value,
       });
-      window.electron.ipcRenderer.sendMessage(
-        'theme:change',
-        value.target.value
-      );
+      // window.electron.ipcRenderer.sendMessage(
+      //   'theme:change',
+      //   value.target.value
+      // );
     }
   };
   const selectRoom = async (skey: any, value: any) => {
@@ -271,43 +273,56 @@ const Setting = () => {
       //   roomid: Number(value.target.value),
       // });
       catConfigData.roomid = Number(value.target.value);
-      window.electron.store.set('roomid', Number(value.target.value));
+      //window.electron.store.set('roomid', Number(value.target.value));
+      GetConfig().then((config: any) => {
+        if (config) {
+          config.roomid = Number(value.target.value);
+          //config.save();
+        }
+      })
       load(value.target.value);
     }
   };
+  const navigate = useNavigate();
   useEffect(() => {
+    WindowSetSize(800, 650);
     // init data
     CatLog.console('init data');
-    window.danmuApi.msgTips((_event: any, data: any) => {
-      CatLog.console(data);
-      toast({
-        title: '提示',
-        description: data,
-        status: data === '修改成功' ? 'success' : 'error',
-        duration: 2000,
-        isClosable: true,
-      });
-    });
-    window.danmuApi.updateMessage((_event: any, data: any) => {
-      CatLog.console(data);
-      if (data === 'Update downloaded') {
-        setState({
-          ...state,
-          downtext: '下载完成',
-        });
-      }
-    });
-    window.danmuApi.downProgress((_event: any, data: any) => {
-      CatLog.console(data);
-      setState({
-        ...state,
-        progress: data[0],
-        transferred: data[1],
-        total: data[2],
-      });
-    });
+    // window.danmuApi.msgTips((_event: any, data: any) => {
+    //   CatLog.console(data);
+    //   toast({
+    //     title: '提示',
+    //     description: data,
+    //     status: data === '修改成功' ? 'success' : 'error',
+    //     duration: 2000,
+    //     isClosable: true,
+    //   });
+    // });
+    // window.danmuApi.updateMessage((_event: any, data: any) => {
+    //   CatLog.console(data);
+    //   if (data === 'Update downloaded') {
+    //     setState({
+    //       ...state,
+    //       downtext: '下载完成',
+    //     });
+    //   }
+    // });
+    // window.danmuApi.downProgress((_event: any, data: any) => {
+    //   CatLog.console(data);
+    //   setState({
+    //     ...state,
+    //     progress: data[0],
+    //     transferred: data[1],
+    //     total: data[2],
+    //   });
+    // });
     const arr = catConfigItem.map((item) =>
-      window.electron.store.get(item.name)
+      //window.electron.store.get(item.name)
+      GetConfig().then((config: any) => {
+        if (config) {
+          return config[item.name];
+        }
+      })
     );
     // eslint-disable-next-line promise/catch-or-return
     Promise.all(arr).then((e) => {
@@ -324,7 +339,7 @@ const Setting = () => {
         if (!catConfigData.clientId) {
           // eslint-disable-next-line promise/no-nesting
           axios
-            .get(`https://api.ririra.com/client/generateClientId`, {
+            .get(`/client/generateClientId`, {
               headers: {
                 version: pack.version,
               },
@@ -417,7 +432,7 @@ const Setting = () => {
   }
   const updateApp = () => {
     CatLog.console('update app');
-    window.electron.ipcRenderer.sendMessage('update:app', []);
+    //window.electron.ipcRenderer.sendMessage('update:app', []);
   };
   let a: NodeJS.Timeout | undefined;
   let b: NodeJS.Timeout | undefined;
@@ -459,14 +474,17 @@ const Setting = () => {
           const SESSDATA = url.split('&')[3].split('=')[1];
           const BILI_JCT = url.split('&')[4].split('=')[1];
           if (SESSDATA && BILI_JCT) {
-            window.electron.store.set('SESSDATA', SESSDATA);
-            window.electron.store.set('csrf', BILI_JCT);
-            window.electron.store.set('uid', DedeUserID);
-            setCatConfigData({
-              ...catConfigData,
-              SESSDATA,
-              csrf: BILI_JCT,
+            // window.electron.store.set('SESSDATA', SESSDATA);
+            // window.electron.store.set('csrf', BILI_JCT);
+            // window.electron.store.set('uid', DedeUserID);
+            GetConfig().then((config: any) => {
+              setCatConfigData({
+                ...catConfigData,
+                SESSDATA,
+                csrf: BILI_JCT,
+              });
             });
+            
             onLoginClose();
             toast({
               title: '提示',
@@ -597,14 +615,24 @@ const Setting = () => {
       catConfigData.recentroomid = catConfigData.recentroomid
         ? `${catConfigData.recentroomid},${Number(roomid)}`
         : `${Number(roomid)}`;
-      window.electron.store.set('roomid', roomid);
-      window.electron.store.set('roomtitle', roomtitle);
-      window.electron.store.set(
-        'recentroomid',
-        catConfigData.recentroomid
-          ? `${catConfigData.recentroomid},${Number(roomid)}`
-          : `${Number(roomid)}`
-      );
+      // window.electron.store.set('roomid', roomid);
+      // window.electron.store.set('roomtitle', roomtitle);
+      // window.electron.store.set(
+      //   'recentroomid',
+      //   catConfigData.recentroomid
+      //     ? `${catConfigData.recentroomid},${Number(roomid)}`
+      //     : `${Number(roomid)}`
+      // );
+      GetConfig().then((config: any) => {
+        if (config) {
+          config.roomid = roomid;
+          config.roomtitle = roomtitle;
+          config.recentroomid = catConfigData.recentroomid
+            ? `${catConfigData.recentroomid},${Number(roomid)}`
+            : `${Number(roomid)}`;
+          //config.save();
+        }
+      })
       load(roomid);
       toast({
         title: '提示',
@@ -873,7 +901,13 @@ const Setting = () => {
                     ...catConfigData,
                     allowUpdate: false,
                   });
-                  window.electron.store.set('allowUpdate', false);
+                  //window.electron.store.set('allowUpdate', false);
+                  GetConfig().then((config: any) => {
+                    if (config) {
+                      config.allowUpdate = false;
+                      //config.save();
+                    }
+                  })
                 }}
                 ml={3}
               >

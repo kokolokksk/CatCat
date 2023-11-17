@@ -126,5 +126,5 @@ const ChatContainer = (prop: any | undefined) => {
 export default ChatContainer;
 
 function send(arg0: { value: string; roomid: any; SESSDATA: any; csrf: any }) {
-  window.electron.ipcRenderer.sendMessage('sendDanmu', [arg0]);
+  //window.electron.ipcRenderer.sendMessage('sendDanmu', [arg0]);
 }

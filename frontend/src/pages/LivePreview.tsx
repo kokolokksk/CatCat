@@ -2,9 +2,11 @@
 import { Flex, useColorMode, useToast } from '@chakra-ui/react';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import CatLog from 'renderer/utils/CatLog';
+import CatLog from '../utils/CatLog';
 import { catConfigItem } from '../components/CatCat';
 import Hls from 'hls.js';
+import { GetConfig } from '../../wailsjs/go/main/App';
+import { WindowSetSize } from '../../wailsjs/runtime/runtime';
 
 const LivePreview = () => {
   const pRef = React.useRef<HTMLVideoElement | null>(null);
@@ -17,9 +19,14 @@ const LivePreview = () => {
   useEffect(() => {
     // init data
     CatLog.console('init data');
+    WindowSetSize(800, 600);
     const arr = catConfigItem.map((item) =>
-      window.electron.store.get(item.name)
-    );
+      GetConfig().then((config: any) => {
+        if (config) {
+          return config[item.name];
+        }
+      }
+    ));
     // eslint-disable-next-line promise/catch-or-return
     Promise.all(arr).then((e) => {
       console.log(e);

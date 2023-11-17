@@ -1,19 +1,39 @@
-# README
+[![HitCount](http://hits.dwyl.com/kokolokksk/catcat.svg)](http://hits.dwyl.com/kokolokksk/catcat)
+![](https://img.shields.io/github/stars/kokolokksk/catcat?color=green&style=flat-square)
+# CatCat  Wails
 
-## About
+![](https://i0.hdslb.com/bfs/new_dyn/750c0c53bbee5e1d4f151b3ac7236bd21999280.png@120w_120h_1e_1c.webp)
+> CatCatDM! Wails!
+> > 喵喵
 
-This is the official Wails React-TS template.
+### 说明
+ 哔哩哔哩直播 弹幕姬：
+  查看直播间弹幕。 
+  - <b>wails 框架 重构中！更小的体积！</b>
+  - 原项目地址：[CatCatDM](https://github.com/kokolokksk/catcat-dm-react)
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
 
-## Live Development
+#### 待做列表
+- [ ] 重构中
 
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
+#### 下一步
+- UI。
 
-## Building
+### 感谢（Thanks）
+- npm module [electron-referer](https://github.com/akameco/electron-referer)
+- npm module [bilibili-live-ws](https://github.com/simon300000/bilibili-live-ws/)
+- npm module [bilibili-live-danmaku-api](https://github.com/simon300000/bilibili-live-danmaku-api)
+- [background image](https://codepen.io/plavookac/pen/QMwObb)
+- [tts间隔问题](https://stackoverflow.com/questions/62564402/microsoft-cognitive-tts-onaudioend-event-not-working)
+- 感谢[jevanni](https://www.deviantart.com/jevanni/art/Miku-Hatsune-Vocaloid-111570363)的动图。
+- [MistEO](https://github.com/MistEO)提出的bug
+- [hongyizs](https://github.com/hongyizs)答疑
+- generated from electron-react-boilerplate/electron-react-boilerplate
 
-To build a redistributable, production mode package, use `wails build`.
+### 交流
+issue 或者 MzE5ODMzOTY5
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=kokolokksk/catcat&type=Date)](https://star-history.com/#kokolokksk/catcat&Date)
+

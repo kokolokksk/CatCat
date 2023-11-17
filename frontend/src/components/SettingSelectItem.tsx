@@ -1,5 +1,6 @@
 import { FormControl, FormLabel, Select, useColorMode } from '@chakra-ui/react';
 import styles from '../styles/setting.module.scss';
+import { GetConfig } from '../../wailsjs/go/main/App';
 
 const SettingSwitchItem = (prop: any | undefined) => {
   const data = {
@@ -33,10 +34,20 @@ const SettingSwitchItem = (prop: any | undefined) => {
   if (skey === 'recentroomid') {
     const saveValue = dynamicOptions.map((item: any) => item.value).join(',');
     if (saveValue) {
-      window.electron.store.set(
-        'recentroomid',
-        dynamicOptions.map((item: any) => item.value).join(',')
+      GetConfig().then((config: any) => {
+        if (config) {
+          if (config.recentroomid !== saveValue) {
+            config.recentroomid = saveValue;
+           // config.save();
+          }
+
+        }
+      }
       );
+      // window.electron.store.set(
+      //   'recentroomid',
+      //   dynamicOptions.map((item: any) => item.value).join(',')
+      // );
     }
   }
   return (

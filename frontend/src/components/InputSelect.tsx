@@ -2,21 +2,27 @@ import { useRef } from 'react';
 
 const InputSelect = (prop: any) => {
   const { label, value, options } = prop;
-  const inputRef = useRef(null);
-  const selectRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const selectRef = useRef<HTMLSelectElement>(null);
 
   const onChange = () => {
-    inputRef.current.value = selectRef.current.value;
+    inputRef.current!.value = selectRef.current?.value || '';
   };
   const addAndSet = () => {
-    const option = document.createElement('option');
-    option.value = inputRef.current.value;
-    option.text = inputRef.current.value;
-    selectRef.current.add(option);
-    selectRef.current.value = inputRef.current.value;
+    if (inputRef.current?.value) {
+      const option = document.createElement('option');
+      option.value = inputRef.current.value;
+      option.text = inputRef.current.value;
+      selectRef.current?.add(option);
+      if (selectRef.current) {
+        selectRef.current.value = inputRef.current.value;
+      }
+    }
   };
   const deleteOption = () => {
-    selectRef.current.remove(selectRef.current.selectedIndex);
+    if (selectRef.current) {
+      selectRef.current.remove(selectRef.current.selectedIndex);
+    }
   };
   return (
     <div className="input-select">

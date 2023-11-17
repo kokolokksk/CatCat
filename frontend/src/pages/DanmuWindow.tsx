@@ -39,9 +39,12 @@ import Danmu from '../components/Danmu';
 import ComeInDisplay from '../components/ComeInDisplay';
 import ChatContainer from '../components/ChatContainer';
 
+import {GetConfig,SetConfig} from "../../wailsjs/go/main/App";
+
 import styles from '../styles/danmu.module.scss';
 import '../styles/dm_a.css';
 import { rejects } from 'assert';
+import { WindowSetSize } from '../../wailsjs/runtime/runtime';
 
 type StateType = {
   pause: boolean;
@@ -135,6 +138,10 @@ class DanmuWindow extends React.Component {
     const arr = catConfigItem.map((item) =>
       // TODO get config from store
       // window.electron.store.get(item.name)
+      GetConfig().then((res) => {
+        CatLog.console(res);
+        return res;
+      })
     );
     arr.map((item: any, index: number) => {
       CatLog.console(item);
@@ -164,6 +171,8 @@ class DanmuWindow extends React.Component {
   }
 
   componentDidMount() {
+    //change window size
+    WindowSetSize(455, 624);
     const { muaConfig, allDmList, scList, comeInList, pause } = this.state;
     CatLog.console('renderer dw');
     setInterval(() => {
@@ -185,115 +194,115 @@ class DanmuWindow extends React.Component {
       countReset();
     }, 1000);
     this.connectLive();
-    window.danmuApi.msgTips((_event: any, data: any) => {
-      toast({
-        title: '提示',
-        description: data,
-        status: 'error',
-        duration: 2000,
-        isClosable: true,
-      });
-    });
-    window.theme.change((_event: any, data: any) => {
-      console.log(data);
-      this.setState({
-        muaConfig: {
-          ...muaConfig,
-          theme: data,
-        },
-      });
-    });
-    window.danmuApi.onUpdateMsg(async (_event: any, data: any) => {
-      // eslint-disable-next-line no-plusplus
-      // eslint-disable-next-line eqeqeq
-      const dm = await transformMsg(data, muaConfig.proxyApi as boolean, {
-        platform: 'pc',
-        room_id: muaConfig.real_roomid as string,
-        area_parent_id: muaConfig.parent_area_id as string,
-        area_id: muaConfig.area_id as string,
-      });
-      if (dm && stringify(dm.data) !== '{}') {
-        this.uploadDanmu(dm);
-        this.writeDanmuToFile(dm, muaConfig.roomid, muaConfig.danmuDir);
-        let merged = false;
-        if (dm.type !== 3) {
-          const listSize = allDmList.list.length;
-          const max = Math.min(listSize, 7);
-          CatLog.console(max);
-          const lastList = allDmList.list.slice(-max);
-          for (let index = 0; index < lastList.length; index += 1) {
-            const tempDanmu = lastList[index];
-            const needmerge = this.needMergeDanmu(tempDanmu, dm);
-            CatLog.console('check mergeble');
-            if (needmerge) {
-              merged = true;
-              if (dm.type === 1) {
-                allDmList.list[index + (listSize - max)].content += '*2';
-              } else if (dm.type === 2) {
-                allDmList.list[index + (listSize - max)].content = `赠送了${
-                  tempDanmu.giftNum + dm.giftNum
-                }个${dm.giftName}`;
-                allDmList.list[index + (listSize - max)].price =
-                  (tempDanmu.price ? tempDanmu.price : 0) +
-                  (dm.price ? dm.price : 0);
-                allDmList.list[index + (listSize - max)].giftNum =
-                  (tempDanmu.giftNum ? tempDanmu.giftNum : 0) +
-                  (dm.giftNum ? dm.giftNum : 0);
-              }
-            }
-          }
-          dm.keyy = data.keyy;
-          if (!merged) {
-            if (allDmList.list.length >= 7) {
-              allDmList.list.shift();
-              CatLog.info('clear some damuka');
-            }
-            if (dm.type === 5) {
-              scList.list.push(dm);
-            }
-            allDmList.list.push(dm);
-            if (dm.content?.startsWith('【') && dm.content?.endsWith('】')) {
-              const content = dm.content
-                .replaceAll('【', '')
-                .replaceAll('】', '');
-              const req = {
-                body: {
-                  messages: [{ role: 'user', content }],
-                },
-              };
-              const res: any = {
-                status: 200,
-                json: '',
-              };
-              // chatgpt(req, res, muaConfig);
-            }
-            if (!pause) {
-              allDmList.autoHeight = 310 - this.listHeightRef?.clientHeight;
-            }
-          }
-          CatLog.console(allDmList);
-          this.setState({
-            allDmList,
-          });
-          if (this.ttsOk || muaConfig.ttsServerUrl) {
-            this.speakDanmuReal(dm);
-          }
-        } else {
-          comeInList.splice(0);
-          comeInList.push(dm);
-          // setComeInLisnt([...comeInLisnt,dm])githubtrans translateYtranslateY
-          this.setState({ comeInList });
-          // eslint-disable-next-line no-plusplus
-          const { comeInLastMinute } = this.state;
-          CatLog.console(comeInLastMinute);
-          this.setState({
-            comeInLastMinute: comeInLastMinute + 1,
-          });
-        }
+    // window.danmuApi.msgTips((_event: any, data: any) => {
+    //   toast({
+    //     title: '提示',
+    //     description: data,
+    //     status: 'error',
+    //     duration: 2000,
+    //     isClosable: true,
+    //   });
+    // });
+    // window.theme.change((_event: any, data: any) => {
+    //   console.log(data);
+    //   this.setState({
+    //     muaConfig: {
+    //       ...muaConfig,
+    //       theme: data,
+    //     },
+    //   });
+    // });
+    // window.danmuApi.onUpdateMsg(async (_event: any, data: any) => {
+    //   // eslint-disable-next-line no-plusplus
+    //   // eslint-disable-next-line eqeqeq
+    //   const dm = await transformMsg(data, muaConfig.proxyApi as boolean, {
+    //     platform: 'pc',
+    //     room_id: muaConfig.real_roomid as string,
+    //     area_parent_id: muaConfig.parent_area_id as string,
+    //     area_id: muaConfig.area_id as string,
+    //   });
+    //   if (dm && stringify(dm.data) !== '{}') {
+    //     this.uploadDanmu(dm);
+    //     this.writeDanmuToFile(dm, muaConfig.roomid, muaConfig.danmuDir);
+    //     let merged = false;
+    //     if (dm.type !== 3) {
+    //       const listSize = allDmList.list.length;
+    //       const max = Math.min(listSize, 7);
+    //       CatLog.console(max);
+    //       const lastList = allDmList.list.slice(-max);
+    //       for (let index = 0; index < lastList.length; index += 1) {
+    //         const tempDanmu = lastList[index];
+    //         const needmerge = this.needMergeDanmu(tempDanmu, dm);
+    //         CatLog.console('check mergeble');
+    //         if (needmerge) {
+    //           merged = true;
+    //           if (dm.type === 1) {
+    //             allDmList.list[index + (listSize - max)].content += '*2';
+    //           } else if (dm.type === 2) {
+    //             allDmList.list[index + (listSize - max)].content = `赠送了${
+    //               tempDanmu.giftNum + dm.giftNum
+    //             }个${dm.giftName}`;
+    //             allDmList.list[index + (listSize - max)].price =
+    //               (tempDanmu.price ? tempDanmu.price : 0) +
+    //               (dm.price ? dm.price : 0);
+    //             allDmList.list[index + (listSize - max)].giftNum =
+    //               (tempDanmu.giftNum ? tempDanmu.giftNum : 0) +
+    //               (dm.giftNum ? dm.giftNum : 0);
+    //           }
+    //         }
+    //       }
+    //       dm.keyy = data.keyy;
+    //       if (!merged) {
+    //         if (allDmList.list.length >= 7) {
+    //           allDmList.list.shift();
+    //           CatLog.info('clear some damuka');
+    //         }
+    //         if (dm.type === 5) {
+    //           scList.list.push(dm);
+    //         }
+    //         allDmList.list.push(dm);
+    //         if (dm.content?.startsWith('【') && dm.content?.endsWith('】')) {
+    //           const content = dm.content
+    //             .replaceAll('【', '')
+    //             .replaceAll('】', '');
+    //           const req = {
+    //             body: {
+    //               messages: [{ role: 'user', content }],
+    //             },
+    //           };
+    //           const res: any = {
+    //             status: 200,
+    //             json: '',
+    //           };
+    //           // chatgpt(req, res, muaConfig);
+    //         }
+    //         if (!pause) {
+    //           allDmList.autoHeight = 310 - this.listHeightRef?.clientHeight;
+    //         }
+    //       }
+    //       CatLog.console(allDmList);
+    //       this.setState({
+    //         allDmList,
+    //       });
+    //       if (this.ttsOk || muaConfig.ttsServerUrl) {
+    //         this.speakDanmuReal(dm);
+    //       }
+    //     } else {
+    //       comeInList.splice(0);
+    //       comeInList.push(dm);
+    //       // setComeInLisnt([...comeInLisnt,dm])githubtrans translateYtranslateY
+    //       this.setState({ comeInList });
+    //       // eslint-disable-next-line no-plusplus
+    //       const { comeInLastMinute } = this.state;
+    //       CatLog.console(comeInLastMinute);
+    //       this.setState({
+    //         comeInLastMinute: comeInLastMinute + 1,
+    //       });
+    //     }
 
-        // CatLog.console(dm)
-      }
-    });
+    //     // CatLog.console(dm)
+    //   }
+    // });
   }
 
   componentDidUpdate(prevProps: any, prevState: any) {
@@ -315,12 +324,15 @@ class DanmuWindow extends React.Component {
   load = (muaConfig: MuaConfig) => {
     CatLog.console('load muaconfig');
     CatLog.console(muaConfig);
-    window.electron.ipcRenderer.sendMessage('setOnTop:setting', [
-      muaConfig.alwaysOnTop,
-    ]);
+    // window.electron.ipcRenderer.sendMessage('setOnTop:setting', [
+    //   muaConfig.alwaysOnTop,
+    // ]);
     // fixme : is already sync
-    new Promise((resolve) => {
-      resolve(window.electron.store.get('ttsKey'));
+   
+     // resolve(window.electron.store.get('ttsKey'));
+     GetConfig().then((res) => {
+        CatLog.console(res);
+        return res.ttsKey;
     })
       .then((res) => {
         if (res && res !== '') {
@@ -362,14 +374,12 @@ class DanmuWindow extends React.Component {
   connectLive = async () => {
     const { muaConfig } = this.state;
     let roomId;
-    new Promise(function (resolve, reject) {
-      resolve(window.electron.store.get('real_roomid'));
-    })
+    GetConfig()
       .then((res) => {
-        window.electron.ipcRenderer.sendMessage('onLive', [res, muaConfig.uid]);
-        window.danmuApi.onUpdateOnliner((_event: any, value: any) => {
-          this.setState({ count: value });
-        });
+        // OnLive([res, muaConfig.uid]);
+        // window.danmuApi.onUpdateOnliner((_event: any, value: any) => {
+        //   this.setState({ count: value });
+        // });
         return '';
       })
       .catch((e) => {
@@ -396,22 +406,22 @@ class DanmuWindow extends React.Component {
       if (danmuDir) {
         const regex =
           /^[a-zA-Z]:\\([^\\:*<>|"?\r\n/]+\\)*([^\\:*<>|"?\r\n/]+)?$/;
-        if (regex.test(danmuDir)) {
-          if (!window.fs.existsSync(danmuDir)) {
-            window.fs.mkdirSync(danmuDir);
-          }
-          if (danmuDir.endsWith('\\' || '/')) {
-            // eslint-disable-next-line no-param-reassign
-            danmuDir = danmuDir.substring(0, danmuDir.length - 1);
-          }
-          window.fs.appendFile(
-            `${danmuDir}/${roomId}-danmu-${date}.txt`,
-            `${datetime} ${dm.nickname}[${dm.fansName}${dm.fansLevel}](${dm.uid}) : ${dm.content}\n`,
-            (err) => {
-              if (err) throw err;
-            }
-          );
-        }
+        // if (regex.test(danmuDir)) {
+        //   if (!window.fs.existsSync(danmuDir)) {
+        //     window.fs.mkdirSync(danmuDir);
+        //   }
+        //   if (danmuDir.endsWith('\\' || '/')) {
+        //     // eslint-disable-next-line no-param-reassign
+        //     danmuDir = danmuDir.substring(0, danmuDir.length - 1);
+        //   }
+        //   window.fs.appendFile(
+        //     `${danmuDir}/${roomId}-danmu-${date}.txt`,
+        //     `${datetime} ${dm.nickname}[${dm.fansName}${dm.fansLevel}](${dm.uid}) : ${dm.content}\n`,
+        //     (err) => {
+        //       if (err) throw err;
+        //     }
+        //   );
+        // }
       }
     }
   };
@@ -654,10 +664,10 @@ class DanmuWindow extends React.Component {
           });
         break;
       case '4':
-        window.electron.ipcRenderer.sendMessage('onCopy', [dm.nickname]);
+        //window.electron.ipcRenderer.sendMessage('onCopy', [dm.nickname]);
         break;
       case '5':
-        window.electron.ipcRenderer.sendMessage('onCopy', [dm.content]);
+        //window.electron.ipcRenderer.sendMessage('onCopy', [dm.content]);
         break;
       default:
         break;
@@ -694,7 +704,7 @@ class DanmuWindow extends React.Component {
     }
     return (
       <>
-        <Titlebar theme={themeMode} />
+        {/* <Titlebar theme={themeMode} /> */}
         {/* <BackgroundWave display={muaConfig.wave} /> */}
         {muaConfig.theme === 'wave' && <BackgroundWave />}
         {muaConfig.theme === 'miku' && <BackgroundMiku />}
@@ -896,7 +906,7 @@ async function send(arg0: {
   csrf: any;
   muaConfig: MuaConfig;
 }) {
-  window.electron.ipcRenderer.sendMessage('sendDanmu', [arg0]);
+  // window.electron.ipcRenderer.sendMessage('sendDanmu', [arg0]);
 }
 
 function sleep(time: number) {

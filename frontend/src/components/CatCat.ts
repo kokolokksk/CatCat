@@ -21,7 +21,7 @@
 //     { name:'fansDisplay',type:'boolean' }
 
 import axios from 'axios';
-import { BiliBiliDanmu } from 'renderer/@types/catcat';
+import { BiliBiliDanmu } from '../@types/catcat';
 
 //     ]
 // const getConfigItem = () => {

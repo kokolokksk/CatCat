@@ -21,6 +21,7 @@ import abStyles from '../styles/about.module.scss';
 import CatCatSign from './CatCatSign';
 import MenuItem from './MenuItem';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 // eslint-disable-next-line import/order
 
@@ -80,14 +81,17 @@ const SliderMenu = (prop: any | undefined) => {
       love =0;
     }
   }
+  const navigate = useNavigate();
   const startDanmuWindow = ()=> {
-    window.electron.ipcRenderer.sendMessage('createDmWindow',[])
+    //window.electron.ipcRenderer.sendMessage('createDmWindow',[])
+    navigate('/dmWindow?loading')
   }
   const createYinWindow = ()=> {
-    window.electron.ipcRenderer.sendMessage('createYinWindow',[])
+    //window.electron.ipcRenderer.sendMessage('createYinWindow',[])
   }
   const startLivePreview = ()=> {
-    window.electron.ipcRenderer.sendMessage('createLivePreview',[])
+    //window.electron.ipcRenderer.sendMessage('createLivePreview',[])
+    navigate('/livePreview?loading')
   }
   const { theme } = dataProp;
   // eslint-disable-next-line no-nested-ternary
@@ -113,7 +117,7 @@ const SliderMenu = (prop: any | undefined) => {
 
           <div className="menu-photo">
 
-            <img className="photo" src={dataProp.faceImg} alt='' />
+            <img className="photo" src={"data:image/jpeg;base64,"+dataProp.faceImg} alt='' />
             <p />
             <div className={abStyles.value && abStyles.title}>
               <Link target="_blank" href={`https://live.bilibili.com/${roomid}`} rel="noreferrer">

@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { TransitionGroup } from 'react-transition-group';
-import { BiliBiliDanmu } from 'renderer/@types/catcat';
+import { BiliBiliDanmu } from '../@types/catcat';
 import style from '../styles/super_chat_bar.module.scss';
 import danmucStyle from '../styles/danmuc.module.scss';
 

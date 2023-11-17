@@ -36,11 +36,11 @@ const Titlebar = (prop: any | undefined) => {
   }
   const handleClick = () => {
     console.info('close');
-    window.electron.ipcRenderer.sendMessage('closeWindow', ['dm-close']);
+    //window.electron.ipcRenderer.sendMessage('closeWindow', ['dm-close']);
   };
   const handleMinusClick = () => {
     console.info('minus');
-    window.electron.ipcRenderer.sendMessage('minusWindow', ['dm-minus']);
+    //window.electron.ipcRenderer.sendMessage('minusWindow', ['dm-minus']);
   };
   return (
     <>

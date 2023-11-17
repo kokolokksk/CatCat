@@ -1,4 +1,4 @@
-import { BiliBiliDanmu } from 'renderer/@types/catcat';
+import { BiliBiliDanmu } from '../@types/catcat';
 import styles from '../styles/danmuc.module.scss';
 
 const ComeInDisplay = (prop: any) => {
