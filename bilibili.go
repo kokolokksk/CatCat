@@ -268,3 +268,65 @@ func GetQRLoginStatus(oauthKey int) ResultQRLoginStatus {
 	json.Unmarshal(body, &result)
 	return result
 }
+
+
+type ResultQRLoginInfo struct {
+	Code    int
+	Status  bool
+	Ts      int
+	Data  struct {
+		Url string
+		OauthKey string
+	}
+}
+
+func GetQRLoginInfo() ResultQRLoginInfo {
+	resp, err := http.Get(BILIBILI_API_QR_LOGIN_URL)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+	var result ResultQRLoginInfo
+	json.Unmarshal(body, &result)
+	return result
+}
+
+{
+    "status": false,
+    "data": -4,
+    "message": "Can't scan~"
+}
+or
+{
+	"code": 0,
+	"status": true,
+	"ts": 1583315474,
+	"data": {
+		"url": "https://passport.biligame.com/crossDomain?DedeUserID=***&DedeUserID__ckMd5=***&Expires=***&SESSDATA=***&bili_jct=***&gourl=http%3A%2F%2Fwww.bilibili.com"
+	}
+}
+
+type ResultQRLoginStatus struct {
+	Status  bool   `json:"status"`
+	Data    interface{} `json:"data"`
+	Message string `json:"message"`
+	Code    int    `json:"code"`
+	Ts      int64  `json:"ts"`
+}
+
+type Data struct {
+	Url string `json:"url"`
+}
+func GetQRLoginStatus(oauthKey int) ResultQRLoginStatus {
+	url := fmt.Sprintf(BILIBILI_API_QR_LOGIN_INFO, oauthKey)
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+	var result ResultQRLoginStatus
+	json.Unmarshal(body, &result)
+	return result
+}
