@@ -17,7 +17,7 @@ import (
 // App struct
 type App struct {
 	ctx  context.Context
-	conf Config
+	conf map[string]interface{}
 }
 
 // NewApp creates a new App application struct
@@ -49,6 +49,12 @@ func (a *App) API_GetRoomInit(realRoomId int) ResultRoomInit {
 }
 func (a *App) API_GetLiveUserInfo(uid int) ResultLiveUserInfo {
 	return GetLiveUserInfo(uid)
+}
+func (a *App) API_GetQRLoginStatus(oauthKey string, contentType string, body map[string]interface{}) ResultQRLoginStatus {
+	return GetQRLoginStatus(oauthKey, contentType, body)
+}
+func (a *App) API_GetQRLoginInfo() ResultQRLoginInfo {
+	return GetQRLoginInfo()
 }
 
 func (a *App) SavePic(faceImg string) string {
@@ -90,11 +96,13 @@ func saveFileFromRemote(url string) (string, error) {
 func loadConfig(a *App) {
 	// load config
 	store.Init("CatCat")
-	var config Config
+	var config = make(map[string]interface{})
 	if err := store.Load("config.json", &config); err != nil {
 		fmt.Println(err)
 	}
 	a.conf = config
+	// print config
+	fmt.Println("config:", config)
 }
 
 // Greet returns a greeting for the given name
@@ -102,17 +110,17 @@ func (a *App) Greet(name string) string {
 	return fmt.Sprintf("Hello %s, It's show time!", name)
 }
 
-func (a *App) GetConfig() Config {
+func (a *App) GetConfig() map[string]interface{} {
 	return a.conf
 }
 
-func (a *App) SetConfig(config Config) {
+func (a *App) SetConfig(config map[string]interface{}) {
 	a.conf = config
 	store.Save("config.json", config)
 }
 
 func (a *App) OnLive() {
-	a.conf.Started = true
+	a.conf["Started"] = true
 	store.Save("config.json", a.conf)
 }
 

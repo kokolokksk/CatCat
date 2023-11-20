@@ -28,7 +28,7 @@ import { catConfigItem } from '../components/CatCat';
 import pack from '../../package.json';
 // import '../samples/electron-store'
 import SettingSwitchItem from '../components/SettingSwitchItem';
-import { GetConfig,API_GetDanmuInfo, API_GetRoomInfo, API_GetRoomInit, API_GetLiveUserInfo, SavePic } from '../../wailsjs/go/main/App';
+import { GetConfig,API_GetDanmuInfo, API_GetRoomInfo, API_GetRoomInit, API_GetLiveUserInfo, SavePic, SetConfig,API_GetQRLoginStatus,API_GetQRLoginInfo } from '../../wailsjs/go/main/App';
 import { BrowserOpenURL, WindowSetSize } from '../../wailsjs/runtime';
 import { useNavigate } from 'react-router-dom';
 // const catConfig = window.catConfig
@@ -85,9 +85,17 @@ const Setting = () => {
                 nickname: resultLiveUserInfo.Data.Info.Uname,
                 live_status: resultLiveUserInfo.Data.Live_status,
               });
+              GetConfig().then(async (config: any) => {
+                if (config) {
+                  config.faceImg = res;
+                  config.nickname = resultLiveUserInfo.Data.Info.Uname;
+                  config.live_status = resultLiveUserInfo.Data.Live_status;
+                  await SetConfig(config);
+                }
+              })
+              catConfigData.live_status = resultLiveUserInfo.Data.Live_status;
             });
             
-            catConfigData.live_status = resultLiveUserInfo.Data.Live_status;
           });
         } 
     });
@@ -101,10 +109,11 @@ const Setting = () => {
         });
         GetConfig().then((config: any) => {
           if (config) {
-            config.real_roomid = res.Data.Room_id;
-            config.area_id = res.Data.Area_id;
-            config.parent_area_id = res.Data.Parent_area_id;
+            config["real_roomid"] = res.Data.Room_id;
+            config["area_id"] = res.Data.Area_id;
+            config["parent_area_id"] = res.Data.Parent_area_id;
             //config.save();
+            SetConfig(config);
           }
         });
       });
@@ -121,18 +130,14 @@ const Setting = () => {
           ? `${catConfigData.recentroomid},${Number(t)}`
           : `${Number(t)}`,
       });
-      // window.electron.store.set(
-      //   'recentroomid',
-      //   catConfigData.recentroomid
-      //     ? `${catConfigData.recentroomid},${Number(t)}`
-      //     : `${Number(t)}`
-      // );
       GetConfig().then((config: any) => {
         if (config) {
-          config.recentroomid = catConfigData.recentroomid
+          config["roomid"] = Number(t);
+          config["recentroomid"] = catConfigData.recentroomid
             ? `${catConfigData.recentroomid},${Number(t)}`
             : `${Number(t)}`;
           //config.save();
+          SetConfig(config);
         }
       })
       load(Number(t));
@@ -155,76 +160,19 @@ const Setting = () => {
       if (config) {
         config[skey] = t;
        // config.save();
+       SetConfig(config);
       }
     })
   };
   const { colorMode, toggleColorMode } = useColorMode();
   CatLog.console(colorMode);
-  // useEffect(() => {
-  //   console.log(22222, catConfigData.roomid);
-  //   if (catConfigData.roomid) {
-  //     load(catConfigData.roomid);
-  //     // commonInputItemSave('roomid', catConfigData.roomid);
-  //   }
-  //   if (catConfigData.allowUpdate) {
-  //     axios
-  //       .get(
-  //         'https://api.github.com/repos/kokolokksk/catcat-dm-react/releases/latest'
-  //       )
-  //       .then((res) => {
-  //         CatLog.console(res.data.tag_name);
-  //         CatLog.console(res.data.name);
-  //         CatLog.console(res.data.body);
-  //         CatLog.console(res.data.html_url);
-  //         CatLog.console(res.data.assets[0].browser_download_url);
-  //         CatLog.console(res.data.assets[0].name);
-  //         CatLog.console(res.data.assets[0].size);
-  //         CatLog.console(res.data.assets[0].updated_at);
-  //         CatLog.console(res.data.assets[0].created_at);
-  //         CatLog.console(res.data.assets[0].content_type);
-  //         setState({
-  //           ...state,
-  //           downtext: '后台下载',
-  //           transferred: 0,
-  //           total: 0,
-  //           version: res.data.tag_name,
-  //           name: res.data.name,
-  //           body: res.data.body,
-  //           html_url: res.data.html_url,
-  //           browser_download_url: res.data.assets[0].browser_download_url,
-  //           file_name: res.data.assets[0].name,
-  //           size: res.data.assets[0].size,
-  //           updated_at: res.data.assets[0].updated_at,
-  //           created_at: res.data.assets[0].created_at,
-  //           content_type: res.data.assets[0].content_type,
-  //         });
-  //         CatLog.console(pack.version, res.data.tag_name);
-  //         if (
-  //           parseInt(pack.version.replaceAll('.', ''), 10) <
-  //           parseInt(
-  //             res.data.tag_name.replaceAll('v', '').replaceAll('.', ''),
-  //             10
-  //           )
-  //         ) {
-  //           CatLog.console('update');
-  //           onOpen();
-  //         } else {
-  //           CatLog.console('no update');
-  //         }
-  //         return '';
-  //       })
-  //       .catch((e) => {
-  //         CatLog.console(e.message);
-  //       });
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [catConfigData.roomid]);
   const commonSwitchItemSave = async (skey: any, value: any) => {
     CatLog.console(value.target.checked);
     //window.electron.store.set(skey, value.target.checked);
     GetConfig().then((config: any) => {
       if (config) {
         config[skey] = value.target.checked;
+        SetConfig(config);
         //config.save();
       }
     })
@@ -247,8 +195,12 @@ const Setting = () => {
    // window.electron.store.set(skey, value.target.value);
     GetConfig().then((config: any) => {
       if (config) {
-        config[skey] = value.target.value;
-        //config.save();
+        if(value.target.value){
+          config[skey] = value.target.value;
+          //config.save();
+          SetConfig(config);
+        }
+       
       }
     })
     if (skey === 'theme') {
@@ -256,6 +208,14 @@ const Setting = () => {
         ...catConfigData,
         theme: value.target.value,
       });
+      GetConfig().then((config: any) => {
+        if (config) {
+          config["theme"] = value.target.value;
+          //config.save();
+          SetConfig(config);
+        }
+      }
+      )
       // window.electron.ipcRenderer.sendMessage(
       //   'theme:change',
       //   value.target.value
@@ -276,8 +236,9 @@ const Setting = () => {
       //window.electron.store.set('roomid', Number(value.target.value));
       GetConfig().then((config: any) => {
         if (config) {
-          config.roomid = Number(value.target.value);
+          config["roomid"] = Number(value.target.value);
           //config.save();
+          SetConfig(config);
         }
       })
       load(value.target.value);
@@ -452,24 +413,16 @@ const Setting = () => {
       });
       return;
     }
-    const data = await axios
-      .post(
-        `https://passport.bilibili.com/qrcode/getLoginInfo?oauthKey=${oauthKey}`,
-        {
-          oauthKey,
-          gourl: 'https://live.bilibili.com/',
-        },
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        }
-      )
-      .then(async (res) => {
+    await API_GetQRLoginStatus(oauthKey,
+       'application/x-www-form-urlencoded',
+      {
+      oauthKey,
+      gourl: 'https://live.bilibili.com/',
+      }).then(async (res:any) => {
         CatLog.console(res.data);
-        if (res.data.code === 0 && res.data.status === true) {
-          console.log(res.data);
-          const { url } = res.data.data;
+        if (res.Code === 0 && res.Status === true) {
+          console.log(res.Data);
+          const { url } = res.Data;
           const DedeUserID = url.split('&')[0].split('=')[1];
           const SESSDATA = url.split('&')[3].split('=')[1];
           const BILI_JCT = url.split('&')[4].split('=')[1];
@@ -483,6 +436,12 @@ const Setting = () => {
                 SESSDATA,
                 csrf: BILI_JCT,
               });
+              if (config) {
+                config.SESSDATA = SESSDATA;
+                config.csrf = BILI_JCT;
+                //config.save();
+                SetConfig(config);
+              }
             });
             
             onLoginClose();
@@ -503,8 +462,8 @@ const Setting = () => {
             });
           }
         }
-        if (res.data.data === -4 && res.data.status === false) {
-          console.log(res.data.message);
+        if (res.Data === -4 && res.Status === false) {
+          console.log(res);
           setState({
             ...state,
             qrUrl: url,
@@ -515,8 +474,8 @@ const Setting = () => {
             checkQrLogin(oauthKey, url);
           }, 10000);
         }
-        if (res.data.data === -5 && res.data.status === false) {
-          console.log(res.data.message);
+        if (res.Data === -5 && res.Status === false) {
+          console.log(res);
           setState({
             ...state,
             qrUrl: url,
@@ -527,25 +486,24 @@ const Setting = () => {
             checkQrLogin(oauthKey, url);
           }, 10000);
         }
-        return res.data;
+        return res.Data;
       });
   };
 
   const freshQrLogin = async () => {
-    const data = await axios
-      .get('https://passport.bilibili.com/qrcode/getLoginUrl')
-      .then((res) => {
-        // CatLog.console(res.data.data.url);
-        setState({
-          ...state,
-          qrUrl: res.data.data.url,
-          loginStatus: '请使用哔哩哔哩App扫码',
-        });
-        setTimeout(() => {
-          checkQrLogin(res.data.data.oauthKey, res.data.data.url);
-        }, 1000);
-        return res.data.data;
+  const data = await  API_GetQRLoginInfo().then(res=>{
+      console.log(res);
+      setState({
+        ...state,
+        qrUrl: res.Data.Url,
+        loginStatus: '请使用哔哩哔哩App扫码',
       });
+      setTimeout(() => {
+        checkQrLogin(res.Data.OauthKey, res.Data.Url);
+      }, 1000);
+      return res.Data;
+    });
+    
     CatLog.console(data);
   };
 
@@ -631,6 +589,7 @@ const Setting = () => {
             ? `${catConfigData.recentroomid},${Number(roomid)}`
             : `${Number(roomid)}`;
           //config.save();
+          SetConfig(config);
         }
       })
       load(roomid);

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,7 +12,7 @@ const BILIBILI_API_GET_DANMU_INFO = "https://api.live.bilibili.com/xlive/web-roo
 const BILIBILI_API_GET_ROOM_INFO = "http://api.live.bilibili.com/room/v1/Room/get_info?room_id=%d"
 const BILIBILI_API_GET_ROOM_INIT = "https://api.live.bilibili.com/room/v1/Room/room_init?id=%d"
 const BILIBILI_API_LIVE_USER_INFO = "https://api.live.bilibili.com/live_user/v1/Master/info?uid=%d"
-const BILIBILI_API_QR_LOGIN_INFO = "https://passport.bilibili.com/qrcode/getLoginInfo?oauthKey=%d"
+const BILIBILI_API_QR_LOGIN_INFO = "https://passport.bilibili.com/qrcode/getLoginInfo?oauthKey=%s"
 const BILIBILI_API_QR_LOGIN_URL = "https://passport.bilibili.com/qrcode/getLoginUrl"
 
 type ResultDanmuInfo struct {
@@ -233,7 +234,20 @@ type ResultQRLoginInfo struct {
 }
 
 func GetQRLoginInfo() ResultQRLoginInfo {
-	resp, err := http.Get(BILIBILI_API_QR_LOGIN_URL)
+	//url := "https://live.bilibili.com"
+	referer := "https://live.bilibili.com"
+
+	req, err := http.NewRequest("GET", BILIBILI_API_QR_LOGIN_URL, nil)
+	if err != nil {
+		fmt.Println("Error creating request:", err)
+		//return
+	}
+
+	req.Header.Set("Referer", referer)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	//resp, err := http.Get(BILIBILI_API_QR_LOGIN_URL)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -241,6 +255,8 @@ func GetQRLoginInfo() ResultQRLoginInfo {
 	body, _ := io.ReadAll(resp.Body)
 	var result ResultQRLoginInfo
 	json.Unmarshal(body, &result)
+	// print result
+	fmt.Println("result:", result)
 	return result
 }
 
@@ -256,77 +272,18 @@ type Data struct {
 	Url string `json:"url"`
 }
 
-func GetQRLoginStatus(oauthKey int) ResultQRLoginStatus {
+func GetQRLoginStatus(oauthKey string, contentType string, body map[string]interface{}) ResultQRLoginStatus {
 	url := fmt.Sprintf(BILIBILI_API_QR_LOGIN_INFO, oauthKey)
-	resp, err := http.Get(url)
+	jsonBody, _ := json.Marshal(body)
+	resp, err := http.Post(url, contentType, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer resp.Body.Close()
-	body, _ := io.ReadAll(resp.Body)
+	rb, _ := io.ReadAll(resp.Body)
 	var result ResultQRLoginStatus
-	json.Unmarshal(body, &result)
-	return result
-}
-
-
-type ResultQRLoginInfo struct {
-	Code    int
-	Status  bool
-	Ts      int
-	Data  struct {
-		Url string
-		OauthKey string
-	}
-}
-
-func GetQRLoginInfo() ResultQRLoginInfo {
-	resp, err := http.Get(BILIBILI_API_QR_LOGIN_URL)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer resp.Body.Close()
-	body, _ := io.ReadAll(resp.Body)
-	var result ResultQRLoginInfo
-	json.Unmarshal(body, &result)
-	return result
-}
-
-{
-    "status": false,
-    "data": -4,
-    "message": "Can't scan~"
-}
-or
-{
-	"code": 0,
-	"status": true,
-	"ts": 1583315474,
-	"data": {
-		"url": "https://passport.biligame.com/crossDomain?DedeUserID=***&DedeUserID__ckMd5=***&Expires=***&SESSDATA=***&bili_jct=***&gourl=http%3A%2F%2Fwww.bilibili.com"
-	}
-}
-
-type ResultQRLoginStatus struct {
-	Status  bool   `json:"status"`
-	Data    interface{} `json:"data"`
-	Message string `json:"message"`
-	Code    int    `json:"code"`
-	Ts      int64  `json:"ts"`
-}
-
-type Data struct {
-	Url string `json:"url"`
-}
-func GetQRLoginStatus(oauthKey int) ResultQRLoginStatus {
-	url := fmt.Sprintf(BILIBILI_API_QR_LOGIN_INFO, oauthKey)
-	resp, err := http.Get(url)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer resp.Body.Close()
-	body, _ := io.ReadAll(resp.Body)
-	var result ResultQRLoginStatus
-	json.Unmarshal(body, &result)
+	json.Unmarshal(rb, &result)
+	// print result
+	fmt.Println("GetQRLoginStatus:", result)
 	return result
 }

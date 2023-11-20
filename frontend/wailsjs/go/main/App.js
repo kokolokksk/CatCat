@@ -10,6 +10,14 @@ export function API_GetLiveUserInfo(arg1) {
   return window['go']['main']['App']['API_GetLiveUserInfo'](arg1);
 }
 
+export function API_GetQRLoginInfo() {
+  return window['go']['main']['App']['API_GetQRLoginInfo']();
+}
+
+export function API_GetQRLoginStatus(arg1, arg2, arg3) {
+  return window['go']['main']['App']['API_GetQRLoginStatus'](arg1, arg2, arg3);
+}
+
 export function API_GetRoomInfo(arg1) {
   return window['go']['main']['App']['API_GetRoomInfo'](arg1);
 }
