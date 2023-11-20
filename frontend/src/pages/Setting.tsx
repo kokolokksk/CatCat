@@ -404,7 +404,7 @@ const Setting = () => {
     globalCount += 1;
     console.log(globalCount);
     console.info('state:', loginWindowClose);
-    if (globalCount > 10) {
+    if (globalCount > 40) {
       console.log('loginWindowClose');
       globalCount = 0;
       setState({
@@ -419,10 +419,10 @@ const Setting = () => {
       oauthKey,
       gourl: 'https://live.bilibili.com/',
       }).then(async (res:any) => {
-        CatLog.console(res.data);
-        if (res.Code === 0 && res.Status === true) {
-          console.log(res.Data);
-          const { url } = res.Data;
+        CatLog.console(res);
+        if (res.code === 0 && res.status) {
+          console.log(res.data);
+          const { url } = res.data;
           const DedeUserID = url.split('&')[0].split('=')[1];
           const SESSDATA = url.split('&')[3].split('=')[1];
           const BILI_JCT = url.split('&')[4].split('=')[1];
@@ -462,7 +462,7 @@ const Setting = () => {
             });
           }
         }
-        if (res.Data === -4 && res.Status === false) {
+        if (res.data == -4) {
           console.log(res);
           setState({
             ...state,
@@ -472,9 +472,9 @@ const Setting = () => {
           console.info('state:', isLoginOpen);
           a = setTimeout(() => {
             checkQrLogin(oauthKey, url);
-          }, 10000);
+          }, 1000);
         }
-        if (res.Data === -5 && res.Status === false) {
+        if (res.data === -5 && res.status === false) {
           console.log(res);
           setState({
             ...state,
@@ -484,7 +484,7 @@ const Setting = () => {
           console.info('state:', isLoginOpen);
           b = setTimeout(() => {
             checkQrLogin(oauthKey, url);
-          }, 10000);
+          }, 1000);
         }
         return res.Data;
       });
