@@ -9,6 +9,7 @@ import (
 	"image/jpeg"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/nfnt/resize"
 	"github.com/tucnak/store"
@@ -16,8 +17,9 @@ import (
 
 // App struct
 type App struct {
-	ctx  context.Context
-	conf map[string]interface{}
+	ctx   context.Context
+	conf  map[string]interface{}
+	blive BiliBiliLive
 }
 
 // NewApp creates a new App application struct
@@ -101,6 +103,7 @@ func loadConfig(a *App) {
 		fmt.Println(err)
 	}
 	a.conf = config
+	a.blive.Status = 0
 	// print config
 	fmt.Println("config:", config)
 }
@@ -119,9 +122,22 @@ func (a *App) SetConfig(config map[string]interface{}) {
 	store.Save("config.json", config)
 }
 
-func (a *App) OnLive() {
-	a.conf["Started"] = true
-	store.Save("config.json", a.conf)
+func (a *App) OnLive(config map[string]interface{}, muaconf map[string]interface{}) string {
+	fmt.Println("OnLive:", config, muaconf)
+	last := ""
+	a.blive.Config = config
+	a.blive.MuaConf = muaconf
+	for {
+		event := <-OnBiliBiliLive(a.blive)
+		if event == last {
+			time.Sleep(2 * time.Second)
+			continue
+		}
+		last = event
+		fmt.Println("event:", event)
+		time.Sleep(2 * time.Second)
+	}
+
 }
 
 func (a *App) Log(str string, level string) {

@@ -1,6 +1,6 @@
 import { FormControl, FormLabel, Select, useColorMode } from '@chakra-ui/react';
 import styles from '../styles/setting.module.scss';
-import { GetConfig } from '../../wailsjs/go/main/App';
+import { GetConfig, SetConfig } from '../../wailsjs/go/main/App';
 
 const SettingSwitchItem = (prop: any | undefined) => {
   const data = {
@@ -39,6 +39,7 @@ const SettingSwitchItem = (prop: any | undefined) => {
           if (config.recentroomid !== saveValue) {
             config.recentroomid = saveValue;
            // config.save();
+           SetConfig(config);
           }
 
         }

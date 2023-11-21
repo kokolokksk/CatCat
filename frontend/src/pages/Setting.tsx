@@ -60,12 +60,14 @@ const Setting = () => {
     if (!num) {
       return;
     }
-    const di = API_GetDanmuInfo(num);
-    di.then((res) => {
+    const di = API_GetDanmuInfo(num).then((res) => {
       console.log("API_GetDanmuInfo",res);
       GetConfig().then((config: any) => {
         if (config) {
           config.key = res.Data.Token;
+          config.host = res.Data.Host_list[0].Host;
+          config.port = res.Data.Host_list[0].Ws_port;
+          SetConfig(config);
         }
       });
     });

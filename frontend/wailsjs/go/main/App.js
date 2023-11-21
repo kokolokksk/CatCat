@@ -38,8 +38,8 @@ export function Log(arg1, arg2) {
   return window['go']['main']['App']['Log'](arg1, arg2);
 }
 
-export function OnLive() {
-  return window['go']['main']['App']['OnLive']();
+export function OnLive(arg1, arg2) {
+  return window['go']['main']['App']['OnLive'](arg1, arg2);
 }
 
 export function SavePic(arg1) {

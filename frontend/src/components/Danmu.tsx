@@ -111,7 +111,7 @@ const Danmu = (prop: any) => {
           className={styles.avatar}
           style={{ display: isDisplayble }}
           onError={changeDisplay}
-          src={data.data.avatarFace}
+          src={"data:image/jpeg;base64,"+data.data.avatarFace}
         />
         <Divider
           orientation="vertical"

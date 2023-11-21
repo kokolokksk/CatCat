@@ -20,7 +20,7 @@ export function Greet(arg1:string):Promise<string>;
 
 export function Log(arg1:string,arg2:string):Promise<void>;
 
-export function OnLive():Promise<void>;
+export function OnLive(arg1:{[key: string]: any},arg2:{[key: string]: any}):Promise<string>;
 
 export function SavePic(arg1:string):Promise<string>;
 

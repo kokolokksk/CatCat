@@ -39,7 +39,7 @@ import Danmu from '../components/Danmu';
 import ComeInDisplay from '../components/ComeInDisplay';
 import ChatContainer from '../components/ChatContainer';
 
-import {GetConfig,SetConfig} from "../../wailsjs/go/main/App";
+import {GetConfig,OnLive,SetConfig} from "../../wailsjs/go/main/App";
 
 import styles from '../styles/danmu.module.scss';
 import '../styles/dm_a.css';
@@ -138,16 +138,16 @@ class DanmuWindow extends React.Component {
     const arr = catConfigItem.map((item) =>
       // TODO get config from store
       // window.electron.store.get(item.name)
-      GetConfig().then((res) => {
-        CatLog.console(res);
-        return res;
+      GetConfig().then((config) => {
+        CatLog.console(config);
+        return config[item.name];
+        //return res;
       })
     );
     arr.map((item: any, index: number) => {
       CatLog.console(item);
       const k = catConfigItem[index].name as string;
       muaConfig[k] = item;
-
       return '';
     });
     this.state = {
@@ -319,7 +319,9 @@ class DanmuWindow extends React.Component {
     // }
   }
 
-  componentWillUnmount() {}
+  componentWillUnmount() {
+
+  }
 
   load = (muaConfig: MuaConfig) => {
     CatLog.console('load muaconfig');
@@ -376,6 +378,12 @@ class DanmuWindow extends React.Component {
     let roomId;
     GetConfig()
       .then((res) => {
+        OnLive(res, muaConfig)
+        .then((res) => {
+          CatLog.console(res);
+          return res;
+        }
+        )
         // OnLive([res, muaConfig.uid]);
         // window.danmuApi.onUpdateOnliner((_event: any, value: any) => {
         //   this.setState({ count: value });
