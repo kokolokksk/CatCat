@@ -8,7 +8,7 @@ export function API_GetLiveUserInfo(arg1:number):Promise<main.ResultLiveUserInfo
 
 export function API_GetQRLoginInfo():Promise<main.ResultQRLoginInfo>;
 
-export function API_GetQRLoginStatus(arg1:string,arg2:string,arg3:{[key: string]: any}):Promise<main.ResultQRLoginStatus>;
+export function API_GetQRLoginStatus(arg1:string):Promise<main.ResultQRLoginStatus>;
 
 export function API_GetRoomInfo(arg1:number):Promise<main.ResultRoomInfo>;
 
@@ -18,9 +18,9 @@ export function GetConfig():Promise<{[key: string]: any}>;
 
 export function Greet(arg1:string):Promise<string>;
 
-export function Log(arg1:string,arg2:string):Promise<void>;
+export function LoadDanmakuEvents(arg1:{[key: string]: any},arg2:{[key: string]: any}):Promise<string>;
 
-export function OnLive(arg1:{[key: string]: any},arg2:{[key: string]: any}):Promise<string>;
+export function Log(arg1:string,arg2:string):Promise<void>;
 
 export function SavePic(arg1:string):Promise<string>;
 

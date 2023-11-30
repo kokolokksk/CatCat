@@ -1,19 +1,20 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/tucnak/store"
 )
 
 const BILIBILI_API_GET_DANMU_INFO = "https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id=%d"
 const BILIBILI_API_GET_ROOM_INFO = "http://api.live.bilibili.com/room/v1/Room/get_info?room_id=%d"
 const BILIBILI_API_GET_ROOM_INIT = "https://api.live.bilibili.com/room/v1/Room/room_init?id=%d"
 const BILIBILI_API_LIVE_USER_INFO = "https://api.live.bilibili.com/live_user/v1/Master/info?uid=%d"
-const BILIBILI_API_QR_LOGIN_INFO = "https://passport.bilibili.com/qrcode/getLoginInfo?oauthKey=%s"
-const BILIBILI_API_QR_LOGIN_URL = "https://passport.bilibili.com/qrcode/getLoginUrl"
+const BILIBILI_API_QR_LOGIN_INFO = "https://passport.bilibili.com/x/passport-login/web/qrcode/poll?qrcode_key=%s"
+const BILIBILI_API_QR_LOGIN_URL = "https://passport.bilibili.com/x/passport-login/web/qrcode/generate"
 
 type ResultDanmuInfo struct {
 	Code    int
@@ -223,13 +224,22 @@ func GetLiveUserInfo(uid int) ResultLiveUserInfo {
 	return result
 }
 
+//	{
+//	    "code": 0,
+//	    "message": "0",
+//	    "ttl": 1,
+//	    "data": {
+//	        "url": "https://passport.bilibili.com/h5-app/passport/login/scan?navhide=1\u0026qrcode_key=8587cf8106a0b863c46d6bab913537f6\u0026from=",
+//	        "qrcode_key": "8587cf8106a0b863c46d6bab913537f6"
+//	    }
+//	}
 type ResultQRLoginInfo struct {
-	Code   int
-	Status bool
-	Ts     int
-	Data   struct {
-		Url      string
-		OauthKey string
+	Code    int
+	Message string
+	Ttl     int
+	Data    struct {
+		Url       string
+		QrcodeKey string `json:"qrcode_key"`
 	}
 }
 
@@ -261,29 +271,73 @@ func GetQRLoginInfo() ResultQRLoginInfo {
 }
 
 type ResultQRLoginStatus struct {
-	Status  bool        `json:"status"`
-	Data    interface{} `json:"data"`
-	Message string      `json:"message"`
-	Code    int         `json:"code"`
-	Ts      int64       `json:"ts"`
+	Data    Data   `json:"data"`
+	Message string `json:"message"`
+	Code    int    `json:"code"`
 }
 
 type Data struct {
-	Url string `json:"url"`
+	Url          string `json:"url"`
+	RefreshToken string `json:"refresh_token"`
+	Timestamp    int    `json:"timestamp"`
+	Code         int    `json:"code"`
+	Message      string `json:"message"`
 }
 
-func GetQRLoginStatus(oauthKey string, contentType string, body map[string]interface{}) ResultQRLoginStatus {
+func GetQRLoginStatus(oauthKey string) ResultQRLoginStatus {
 	url := fmt.Sprintf(BILIBILI_API_QR_LOGIN_INFO, oauthKey)
-	jsonBody, _ := json.Marshal(body)
-	resp, err := http.Post(url, contentType, bytes.NewBuffer(jsonBody))
+	fmt.Println("url:", url)
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Println("Error creating request:", err)
+	}
+	// Set the Content-Type header
+	// req.Header.Set("Content-Type", contentType)
+
+	// Set the Referer header
+	req.Header.Set("Referer", "https://live.bilibili.com")
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", "*/*")
+	}
+	req.Header.Set("Host", "passport.bilibili.com")
+	req.Header.Set("Origin", "https://live.bilibili.com")
+
+	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)")
+	// Perform the HTTP request
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error making request:", err)
+	}
+	defer resp.Body.Close()
+	//resp, err := http.Post(url, contentType, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer resp.Body.Close()
 	rb, _ := io.ReadAll(resp.Body)
 	var result ResultQRLoginStatus
+
 	json.Unmarshal(rb, &result)
+	if result.Data.Code == 0 && result.Data.Url != "" {
+		// try get cookies
+		cookies := resp.Cookies()
+		//client.Jar.SetCookies(req.URL, cookies)
+		store.Init("CatCat")
+		var config = make(map[string]interface{})
+		if err := store.Load("config.json", &config); err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println("Cookies:")
+
+		for _, cookie := range cookies {
+			fmt.Printf("%s: %s\n", cookie.Name, cookie.Value)
+
+		}
+
+	}
 	// print result
 	fmt.Println("GetQRLoginStatus:", result)
+
 	return result
 }

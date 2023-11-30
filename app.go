@@ -9,7 +9,6 @@ import (
 	"image/jpeg"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/nfnt/resize"
 	"github.com/tucnak/store"
@@ -52,8 +51,8 @@ func (a *App) API_GetRoomInit(realRoomId int) ResultRoomInit {
 func (a *App) API_GetLiveUserInfo(uid int) ResultLiveUserInfo {
 	return GetLiveUserInfo(uid)
 }
-func (a *App) API_GetQRLoginStatus(oauthKey string, contentType string, body map[string]interface{}) ResultQRLoginStatus {
-	return GetQRLoginStatus(oauthKey, contentType, body)
+func (a *App) API_GetQRLoginStatus(oauthKey string) ResultQRLoginStatus {
+	return GetQRLoginStatus(oauthKey)
 }
 func (a *App) API_GetQRLoginInfo() ResultQRLoginInfo {
 	return GetQRLoginInfo()
@@ -122,22 +121,14 @@ func (a *App) SetConfig(config map[string]interface{}) {
 	store.Save("config.json", config)
 }
 
-func (a *App) OnLive(config map[string]interface{}, muaconf map[string]interface{}) string {
+func (a *App) LoadDanmakuEvents(config map[string]interface{}, muaconf map[string]interface{}) string {
 	fmt.Println("OnLive:", config, muaconf)
-	last := ""
+
 	a.blive.Config = config
 	a.blive.MuaConf = muaconf
-	for {
-		event := <-OnBiliBiliLive(a.blive)
-		if event == last {
-			time.Sleep(2 * time.Second)
-			continue
-		}
-		last = event
-		fmt.Println("event:", event)
-		time.Sleep(2 * time.Second)
-	}
-
+	event := <-OnBiliBiliLive(a, a.blive, "ALL")
+	fmt.Println("OnDanmakuChannel:", event)
+	return "loaded"
 }
 
 func (a *App) Log(str string, level string) {

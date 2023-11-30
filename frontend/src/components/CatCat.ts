@@ -22,6 +22,7 @@
 
 import axios from 'axios';
 import { BiliBiliDanmu } from '../@types/catcat';
+import { API_GetLiveUserInfo, SavePic } from '../../wailsjs/go/main/App';
 
 //     ]
 // const getConfigItem = () => {
@@ -503,31 +504,45 @@ const getNewSessionId = () => {
 };
 
 async function setFace(danmu: any, proxyApi: boolean) {
-  const url = `https://api.live.bilibili.com/live_user/v1/Master/info?uid=${danmu.uid}`;
-  await axios({
-    url,
-    // https://api.live.bilibili.com/live_user/v1/Master/info?uid=${danmu.uid}
-  })
+  API_GetLiveUserInfo(danmu.uid).then((resultLiveUserInfo) => {
+    console.log(resultLiveUserInfo);
+      const loaclPicUrl = SavePic(resultLiveUserInfo.Data.Info.Face);
+      console.log("loaclPicUrl",loaclPicUrl);
+      loaclPicUrl.then((res) => {
+        if (proxyApi) {
+          danmu.avatarFace = res;
+        } else {
+          danmu.avatarFace = res;
+        }
+        
+      });
+      
+    });
+  // const url = `https://api.live.bilibili.com/live_user/v1/Master/info?uid=${danmu.uid}`;
+  // await axios({
+  //   url,
+  //   // https://api.live.bilibili.com/live_user/v1/Master/info?uid=${danmu.uid}
+  // })
     // eslint-disable-next-line func-names
     // eslint-disable-next-line promise/always-return
     // eslint-disable-next-line @typescript-eslint/no-shadow
     // eslint-disable-next-line func-names
     // eslint-disable-next-line promise/always-return
-    .then(function (response1) {
-      // eslint-disable-next-line promise/always-return
-      if (danmu) {
-        if (proxyApi) {
-          danmu.avatarFace = response1.data.face;
-        } else {
-          danmu.avatarFace = response1.data.data.info.face;
-        }
-        // response1.data.data.info.face
-      }
-    })
-    // eslint-disable-next-line func-names
-    .catch(function (error) {
-      console.log(error);
-    });
+  //  .then(function (response1) {
+    //   // eslint-disable-next-line promise/always-return
+    //   if (danmu) {
+    //     if (proxyApi) {
+    //       danmu.avatarFace = response1.data.face;
+    //     } else {
+    //       danmu.avatarFace = response1.data.data.info.face;
+    //     }
+    //     // response1.data.data.info.face
+    //   }
+    // })
+    // // eslint-disable-next-line func-names
+    // .catch(function (error) {
+    //   console.log(error);
+    // });
 }
 const superchat = {
   cmd: 'SUPER_CHAT_MESSAGE',
@@ -610,7 +625,7 @@ async function handleDanMuMSG(
   danmu.content = data.info[1];
   danmu.price = 0;
   danmu.giftNum = 0;
-  if (process.env.NODE_ENV === 'development') {
+  if (false) {
     if (danmu.content.indexOf('cat2') !== -1) {
       danmu.type = 2;
     }
@@ -674,6 +689,7 @@ const transformMsg = async (
     giftNum: 0,
   };
   // console.info(data)
+  console.info(data?.cmd);
   // xxxxxxx
   // eslint-disable-next-line default-case
   switch (data.cmd) {

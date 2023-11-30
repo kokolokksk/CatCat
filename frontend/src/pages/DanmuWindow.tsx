@@ -39,12 +39,12 @@ import Danmu from '../components/Danmu';
 import ComeInDisplay from '../components/ComeInDisplay';
 import ChatContainer from '../components/ChatContainer';
 
-import {GetConfig,OnLive,SetConfig} from "../../wailsjs/go/main/App";
+import {GetConfig,LoadDanmakuEvents,SetConfig} from "../../wailsjs/go/main/App";
 
 import styles from '../styles/danmu.module.scss';
 import '../styles/dm_a.css';
 import { rejects } from 'assert';
-import { WindowSetSize } from '../../wailsjs/runtime/runtime';
+import { EventsOn, WindowSetSize } from '../../wailsjs/runtime/runtime';
 
 type StateType = {
   pause: boolean;
@@ -108,6 +108,7 @@ class DanmuWindow extends React.Component {
 
   constructor(props: PropType) {
     const muaConfig: MuaConfig = {
+      liveStatus: false,
       count: 0,
       roomid: 0,
       clientId: '',
@@ -194,6 +195,103 @@ class DanmuWindow extends React.Component {
       countReset();
     }, 1000);
     this.connectLive();
+
+    EventsOn("OnMsg", async (m)=>{
+      const { muaConfig, allDmList, scList, comeInList, pause } = this.state;
+      let data = m
+  //""{\"cmd\":\"DANMU_MSG\",\"info\":[[0,1,25,16777215,1701240684298,259018224,0,\"87b6f788\",0,0,0,\"\",0,\"{}\",\"{}\",{\"mode\":0,\"show_player_type\":0,\"extra\":\"{\\\"send_from_me\\\":false,\\\"mode\\\":0,\\\"color\\\":16777215,\\\"dm_type\\\":0,\\\"font_size\\\":25,\\\"player_mode\\\":1,\\\"show_player_type\\\":0,\\\"content\\\":\\\"fff\\\",\\\"user_hash\\\":\\\"2276915080\\\",\\\"emoticon_unique\\\":\\\"\\\",\\\"bulge_display\\\":0,\\\"recommend_score\\\":6,\\\"main_state_dm_color\\\":\\\"\\\",\\\"objective_state_dm_color\\\":\\\"\\\",\\\"direction\\\":0,\\\"pk_direction\\\":0,\\\"quartet_direction\\\":0,\\\"anniversary_crowd\\\":0,\\\"yeah_space_type\\\":\\\"\\\",\\\"yeah_space_url\\\":\\\"\\\",\\\"jump_to_url\\\":\\\"\\\",\\\"space_type\\\":\\\"\\\",\\\"space_url\\\":\\\"\\\",\\\"animation\\\":{},\\\"emots\\\":null,\\\"is_audited\\\":false,\\\"id_str\\\":\\\"3bd64026384a344c1f9765c65e6566df33\\\",\\\"icon\\\":null,\\\"show_reply\\\":true,\\\"reply_mid\\\":0,\\\"reply_uname\\\":\\\"\\\",\\\"reply_uname_color\\\":\\\"\\\",\\\"hit_combo\\\":0}\"},{\"activity_identity\":\"\",\"activity_source\":0,\"not_show\":0},0],\"fff\",[0,\"菈***\",0,0,0,10000,1,\"\"],[23,\"导盲猫\",\"诺子喵呜\",21654925,1725515,\"\",0,12632256,12632256,12632256,0,0,10276136],[20,0,6406234,\"\\u003e50000\",1],[\"\",\"\"],0,0,null,{\"ts\":1701240684,\"ct\":\"7C899FD7\"},0,0,null,null,0,210,[22],null],\"dm_v2\":\"\"}""
+  
+  data = data.slice(1, -1).replace(/\\"/g, "\"").replace(/\\/g, "");
+  data = data.replace(/\"{/g, "{").replace(/}\"/g, "}");
+  data = JSON.parse(data);
+  const dm = await transformMsg(data, muaConfig.proxyApi as boolean, {
+    platform: 'pc',
+    room_id: muaConfig.real_roomid as string,
+    area_parent_id: muaConfig.parent_area_id as string,
+    area_id: muaConfig.area_id as string,
+  });
+  if (dm) {
+    this.uploadDanmu(dm);
+    this.writeDanmuToFile(dm, muaConfig.roomid ?? '', muaConfig.danmuDir ?? '');
+    let merged = false;
+    if (dm.type !== 3) {
+      const listSize = allDmList.list.length;
+      const max = Math.min(listSize, 7);
+      CatLog.console(max);
+      const lastList = allDmList.list.slice(-max);
+      for (let index = 0; index < lastList.length; index += 1) {
+        const tempDanmu = lastList[index];
+        const needmerge = this.needMergeDanmu(tempDanmu, dm);
+        CatLog.console('check mergeble');
+        if (needmerge) {
+          merged = true;
+          if (dm.type === 1) {
+            allDmList.list[index + (listSize - max)].content += '*2';
+          } else if (dm.type === 2) {
+            allDmList.list[index + (listSize - max)].content = `赠送了${
+              tempDanmu.giftNum + dm.giftNum
+            }个${dm.giftName}`;
+            allDmList.list[index + (listSize - max)].price =
+              (tempDanmu.price ? tempDanmu.price : 0) +
+              (dm.price ? dm.price : 0);
+            allDmList.list[index + (listSize - max)].giftNum =
+              (tempDanmu.giftNum ? tempDanmu.giftNum : 0) +
+              (dm.giftNum ? dm.giftNum : 0);
+          }
+        }
+      }
+      dm.keyy = data.keyy;
+      if (!merged) {
+        if (allDmList.list.length >= 7) {
+          allDmList.list.shift();
+          CatLog.info('clear some damuka');
+        }
+        if (dm.type === 5) {
+          scList.list.push(dm);
+        }
+        allDmList.list.push(dm);
+        if (dm.content?.startsWith('【') && dm.content?.endsWith('】')) {
+          const content = dm.content
+            .replaceAll('【', '')
+            .replaceAll('】', '');
+          const req = {
+            body: {
+              messages: [{ role: 'user', content }],
+            },
+          };
+          const res: any = {
+            status: 200,
+            json: '',
+          };
+          // chatgpt(req, res, muaConfig);
+        }
+        if (!pause) {
+          allDmList.autoHeight = 310 - this.listHeightRef?.clientHeight;
+        }
+      }
+      CatLog.console(allDmList);
+      this.setState({
+        allDmList,
+      });
+      if (this.ttsOk || muaConfig.ttsServerUrl) {
+        this.speakDanmuReal(dm);
+      }
+    } else {
+      comeInList.splice(0);
+      comeInList.push(dm);
+      // setComeInLisnt([...comeInLisnt,dm])githubtrans translateYtranslateY
+      this.setState({ comeInList });
+      // eslint-disable-next-line no-plusplus
+      const { comeInLastMinute } = this.state;
+      CatLog.console(comeInLastMinute);
+      this.setState({
+        comeInLastMinute: comeInLastMinute + 1,
+      });
+    }
+
+    // CatLog.console(dm)
+  }
+ });
     // window.danmuApi.msgTips((_event: any, data: any) => {
     //   toast({
     //     title: '提示',
@@ -373,17 +471,24 @@ class DanmuWindow extends React.Component {
     return same;
   };
 
+  
   connectLive = async () => {
-    const { muaConfig } = this.state;
+    const { muaConfig, allDmList, scList, comeInList, pause } = this.state;
     let roomId;
     GetConfig()
-      .then((res) => {
-        OnLive(res, muaConfig)
-        .then((res) => {
-          CatLog.console(res);
-          return res;
+      .then(async (res) => {
+        if(!muaConfig.liveStatus){
+          console.log('try to onlive');
+          muaConfig.liveStatus = true;
+          await LoadDanmakuEvents(res, muaConfig)
+          .then(async (res: any) => {
+           
+          }
+          ).catch((e) => {
+            console.log(e);
+          });
         }
-        )
+        
         // OnLive([res, muaConfig.uid]);
         // window.danmuApi.onUpdateOnliner((_event: any, value: any) => {
         //   this.setState({ count: value });
@@ -394,7 +499,7 @@ class DanmuWindow extends React.Component {
         CatLog.console(e);
       });
   };
-
+  
   uploadDanmu = (dm: BiliBiliDanmu) => {
     // interface: upload danmu to server
   };

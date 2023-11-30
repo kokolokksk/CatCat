@@ -14,8 +14,8 @@ export function API_GetQRLoginInfo() {
   return window['go']['main']['App']['API_GetQRLoginInfo']();
 }
 
-export function API_GetQRLoginStatus(arg1, arg2, arg3) {
-  return window['go']['main']['App']['API_GetQRLoginStatus'](arg1, arg2, arg3);
+export function API_GetQRLoginStatus(arg1) {
+  return window['go']['main']['App']['API_GetQRLoginStatus'](arg1);
 }
 
 export function API_GetRoomInfo(arg1) {
@@ -34,12 +34,12 @@ export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
 
-export function Log(arg1, arg2) {
-  return window['go']['main']['App']['Log'](arg1, arg2);
+export function LoadDanmakuEvents(arg1, arg2) {
+  return window['go']['main']['App']['LoadDanmakuEvents'](arg1, arg2);
 }
 
-export function OnLive(arg1, arg2) {
-  return window['go']['main']['App']['OnLive'](arg1, arg2);
+export function Log(arg1, arg2) {
+  return window['go']['main']['App']['Log'](arg1, arg2);
 }
 
 export function SavePic(arg1) {

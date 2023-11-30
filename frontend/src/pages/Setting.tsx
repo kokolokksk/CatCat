@@ -66,7 +66,7 @@ const Setting = () => {
         if (config) {
           config.key = res.Data.Token;
           config.host = res.Data.Host_list[0].Host;
-          config.port = res.Data.Host_list[0].Ws_port;
+          config.port = res.Data.Host_list[0].Wss_port;
           SetConfig(config);
         }
       });
@@ -399,6 +399,7 @@ const Setting = () => {
   };
   let a: NodeJS.Timeout | undefined;
   let b: NodeJS.Timeout | undefined;
+  let c: NodeJS.Timeout | undefined;
   let loginWindowClose = true;
   let globalCount = 0;
   const checkQrLogin = async (oauthKey: string, url: string) => {
@@ -415,14 +416,9 @@ const Setting = () => {
       });
       return;
     }
-    await API_GetQRLoginStatus(oauthKey,
-       'application/x-www-form-urlencoded',
-      {
-      oauthKey,
-      gourl: 'https://live.bilibili.com/',
-      }).then(async (res:any) => {
+    await API_GetQRLoginStatus(oauthKey).then(async (res:any) => {
         CatLog.console(res);
-        if (res.code === 0 && res.status) {
+        if (res.data.code === 0 && res.data.url != "") {
           console.log(res.data);
           const { url } = res.data;
           const DedeUserID = url.split('&')[0].split('=')[1];
@@ -441,6 +437,7 @@ const Setting = () => {
               if (config) {
                 config.SESSDATA = SESSDATA;
                 config.csrf = BILI_JCT;
+                config.uid = DedeUserID;
                 //config.save();
                 SetConfig(config);
               }
@@ -464,7 +461,7 @@ const Setting = () => {
             });
           }
         }
-        if (res.data == -4) {
+        if (res.data.code == 86101) {
           console.log(res);
           setState({
             ...state,
@@ -476,7 +473,7 @@ const Setting = () => {
             checkQrLogin(oauthKey, url);
           }, 1000);
         }
-        if (res.data === -5 && res.status === false) {
+        if (res.data.code === 86090) {
           console.log(res);
           setState({
             ...state,
@@ -485,6 +482,18 @@ const Setting = () => {
           });
           console.info('state:', isLoginOpen);
           b = setTimeout(() => {
+            checkQrLogin(oauthKey, url);
+          }, 1000);
+        }
+        if (res.data.code === 86038) {
+          console.log(res);
+          setState({
+            ...state,
+            qrUrl: url,
+            loginStatus: '二维码已失效',
+          });
+          console.info('state:', isLoginOpen);
+          c = setTimeout(() => {
             checkQrLogin(oauthKey, url);
           }, 1000);
         }
@@ -501,7 +510,7 @@ const Setting = () => {
         loginStatus: '请使用哔哩哔哩App扫码',
       });
       setTimeout(() => {
-        checkQrLogin(res.Data.OauthKey, res.Data.Url);
+        checkQrLogin(res.Data.qrcode_key, res.Data.Url);
       }, 1000);
       return res.Data;
     });
@@ -524,6 +533,7 @@ const Setting = () => {
   const tryCloseQrLogin = () => {
     clearTimeout(a);
     clearTimeout(b);
+    clearTimeout(c);
     CatLog.console('tryCloseQrLogin');
     loginWindowClose = true;
     onLoginClose();
