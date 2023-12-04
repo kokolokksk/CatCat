@@ -91,6 +91,10 @@ func OnBiliBiliLive(a *App, blive BiliBiliLive, even string) chan string {
 			select {}
 		} else {
 			c := a.blive.client
+			c.Stop()
+			c = client.NewClient(int(blive.Config["roomid"].(float64))) // 房间号'
+			config := blive.Config
+			c.SetCookie(fmt.Sprintf("DedeUserID=%s; SESSDATA=%s; bili_jct=%s", config["DedeUserID"], config["SESSDATA"], config["bili_jct"]))
 			fmt.Println("BiliBiliLive is running")
 			c.RegisterCustomEventHandler("DANMU_MSG", func(s string) {
 				data, err := json.Marshal(s)
@@ -142,10 +146,10 @@ func OnBiliBiliLive(a *App, blive BiliBiliLive, even string) chan string {
 				runtime.EventsEmit(a.ctx, "OnMsg", string(data))
 				OnAllCmdChannel <- string(data)
 			})
-			// err := c.Start()
-			// if err != nil {
-			// 	log.Fatal(err)
-			// }
+			err := c.Start()
+			if err != nil {
+				log.Fatal(err)
+			}
 			log.Println("started")
 			a.blive.Status = 1
 			a.blive.client = c
