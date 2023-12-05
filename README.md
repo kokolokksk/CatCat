@@ -1,5 +1,6 @@
 [![HitCount](http://hits.dwyl.com/kokolokksk/catcat.svg)](http://hits.dwyl.com/kokolokksk/catcat)
 ![](https://img.shields.io/github/stars/kokolokksk/catcat?color=green&style=flat-square)
+# ~不禁想问为什么要用wails? v2很好 但没多窗口 v3 alpha 有多窗口 但是到处报错~
 # CatCat  Wails
 
 ![](https://i0.hdslb.com/bfs/new_dyn/750c0c53bbee5e1d4f151b3ac7236bd21999280.png@120w_120h_1e_1c.webp)
@@ -14,10 +15,11 @@
 
 
 #### 待做列表
-- [ ] 重构中
+- [ ] 没有待做
 
 #### 下一步
-- UI。
+- 没有下一步
+- 请关注 [CatCatDM](https://github.com/kokolokksk/catcat-dm-react)
 
 ### 感谢（Thanks）
 - npm module [electron-referer](https://github.com/akameco/electron-referer)
