@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/Akegarasu/blivedm-go/client"
 	_ "github.com/Akegarasu/blivedm-go/utils"
@@ -27,7 +28,19 @@ func OnBiliBiliLive(a *App, blive BiliBiliLive, even string) chan string {
 
 	go func() {
 		if a.blive.Status == 0 {
-			c := client.NewClient(int(blive.Config["roomid"].(float64))) // 房间号'
+			roomIDStr, ok := blive.Config["roomid"].(string)
+			if !ok {
+				fmt.Println("Error: roomid is not a string")
+				return
+			}
+
+			// 将字符串转换为整数
+			roomID, err := strconv.Atoi(roomIDStr)
+			if err != nil {
+				fmt.Println("Error converting string to int:", err)
+				return
+			}
+			c := client.NewClient(roomID) // 房间号'
 			config := blive.Config
 			c.SetCookie(fmt.Sprintf("DedeUserID=%s; SESSDATA=%s; bili_jct=%s", config["DedeUserID"], config["SESSDATA"], config["bili_jct"]))
 			c.RegisterCustomEventHandler("DANMU_MSG", func(s string) {
@@ -81,7 +94,15 @@ func OnBiliBiliLive(a *App, blive BiliBiliLive, even string) chan string {
 				runtime.EventsEmit(a.ctx, "OnMsg", string(data))
 				OnAllCmdChannel <- string(data)
 			})
-			err := c.Start()
+			c.RegisterCustomEventHandler("INTERACT_WORD", func(s string) {
+				data, err := json.Marshal(s)
+				if err != nil {
+					fmt.Println("Error marshaling danmaku:", err)
+				}
+				runtime.EventsEmit(a.ctx, "OnMsg", string(data))
+				OnAllCmdChannel <- string(data)
+			})
+			err = c.Start()
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -92,7 +113,19 @@ func OnBiliBiliLive(a *App, blive BiliBiliLive, even string) chan string {
 		} else {
 			c := a.blive.client
 			c.Stop()
-			c = client.NewClient(int(blive.Config["roomid"].(float64))) // 房间号'
+			roomIDStr, ok := blive.Config["roomid"].(string)
+			if !ok {
+				fmt.Println("Error: roomid is not a string")
+				return
+			}
+
+			// 将字符串转换为整数
+			roomID, err := strconv.Atoi(roomIDStr)
+			if err != nil {
+				fmt.Println("Error converting string to int:", err)
+				return
+			}
+			c = client.NewClient(roomID) // 房间号'
 			config := blive.Config
 			c.SetCookie(fmt.Sprintf("DedeUserID=%s; SESSDATA=%s; bili_jct=%s", config["DedeUserID"], config["SESSDATA"], config["bili_jct"]))
 			fmt.Println("BiliBiliLive is running")
@@ -146,7 +179,15 @@ func OnBiliBiliLive(a *App, blive BiliBiliLive, even string) chan string {
 				runtime.EventsEmit(a.ctx, "OnMsg", string(data))
 				OnAllCmdChannel <- string(data)
 			})
-			err := c.Start()
+			c.RegisterCustomEventHandler("INTERACT_WORD", func(s string) {
+				data, err := json.Marshal(s)
+				if err != nil {
+					fmt.Println("Error marshaling danmaku:", err)
+				}
+				runtime.EventsEmit(a.ctx, "OnMsg", string(data))
+				OnAllCmdChannel <- string(data)
+			})
+			err = c.Start()
 			if err != nil {
 				log.Fatal(err)
 			}

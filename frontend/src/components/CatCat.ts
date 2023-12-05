@@ -42,7 +42,7 @@ import { API_GetLiveUserInfo, SavePic } from '../../wailsjs/go/main/App';
 // }
 
 const catConfigItem = [
-  { name: 'roomid', type: 'number' },
+  { name: 'roomid', type: 'string' },
   { name: 'clientId', type: 'string' },
   { name: 'ttsDanmu', type: 'boolean' },
   { name: 'ttsGift', type: 'boolean' },

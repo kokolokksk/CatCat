@@ -29,7 +29,7 @@ import pack from '../../package.json';
 // import '../samples/electron-store'
 import SettingSwitchItem from '../components/SettingSwitchItem';
 import { GetConfig,API_GetDanmuInfo, API_GetRoomInfo, API_GetRoomInit, API_GetLiveUserInfo, SavePic, SetConfig,API_GetQRLoginStatus,API_GetQRLoginInfo } from '../../wailsjs/go/main/App';
-import { BrowserOpenURL, WindowSetSize } from '../../wailsjs/runtime';
+import { BrowserOpenURL, WindowSetAlwaysOnTop, WindowSetSize } from '../../wailsjs/runtime';
 import { useNavigate } from 'react-router-dom';
 // const catConfig = window.catConfig
 // catConfig.setDataPath('F://catConfig.json')
@@ -55,12 +55,12 @@ const Setting = () => {
   const [catConfigData, setCatConfigData] = useState(obj);
   const [state, setState] = useState(obj);
   const color = useColorMode();
-  const load = (num: number) => {
-    CatLog.console('on load user img and nickname');
+  const load = (num: string) => {
+    console.info('on load user img and nickname');
     if (!num) {
       return;
     }
-    const di = API_GetDanmuInfo(num).then((res) => {
+    const di = API_GetDanmuInfo(parseInt(num)).then((res) => {
       console.log("API_GetDanmuInfo",res);
       GetConfig().then((config: any) => {
         if (config) {
@@ -72,7 +72,7 @@ const Setting = () => {
       });
     });
 
-    API_GetRoomInit(num).then((res) => {
+    API_GetRoomInit(parseInt(num)).then((res) => {
       console.log("API_GetRoomInit",res);
       const  uid   = res.Data.Uid;
       if (uid) {
@@ -101,7 +101,7 @@ const Setting = () => {
           });
         } 
     });
-    API_GetRoomInfo(num).then((res) => {
+    API_GetRoomInfo(parseInt(num)).then((res) => {
         console.log("API_GetRoomInfo",res);
         setCatConfigData({
           ...catConfigData,
@@ -142,7 +142,7 @@ const Setting = () => {
           SetConfig(config);
         }
       })
-      load(Number(t));
+      load(t as string);
       catConfigData.roomid = Number(t);
       catConfigData.recentroomid = catConfigData.recentroomid
         ? `${catConfigData.recentroomid},${Number(t)}`
@@ -191,6 +191,7 @@ const Setting = () => {
       // window.electron.ipcRenderer.sendMessage('setOnTop:setting', [
       //   value.target.checked,
       // ]);
+      WindowSetAlwaysOnTop(value.target.checked);
     }
   };
   const commonSelectItemSave = async (skey: any, value: any) => {
@@ -238,11 +239,12 @@ const Setting = () => {
       //window.electron.store.set('roomid', Number(value.target.value));
       GetConfig().then((config: any) => {
         if (config) {
-          config["roomid"] = Number(value.target.value);
+          config["roomid"] = value.target.value;
           //config.save();
           SetConfig(config);
         }
       })
+      console.log(value.target.value);
       load(value.target.value);
     }
   };
@@ -320,7 +322,7 @@ const Setting = () => {
             });
         }
         if (catConfigData.roomid) {
-          load(catConfigData.roomid);
+          load(catConfigData.roomid as string);
         }
         if (catConfigData.allowUpdate) {
           // eslint-disable-next-line promise/no-nesting
@@ -604,7 +606,7 @@ const Setting = () => {
           SetConfig(config);
         }
       })
-      load(roomid);
+      load(roomid as string);
       toast({
         title: '提示',
         description: '同步用户信息成功',
