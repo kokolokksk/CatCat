@@ -15,10 +15,11 @@
 
 
 #### 待做列表
-- [ ] 重构中
+- [ ] 没有待做
 
 #### 下一步
-- UI。
+- 没有下一步
+- 请关注 [CatCatDM](https://github.com/kokolokksk/catcat-dm-react)
 
 ### 感谢（Thanks）
 - npm module [electron-referer](https://github.com/akameco/electron-referer)
